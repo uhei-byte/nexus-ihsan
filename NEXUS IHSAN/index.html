@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta viewport dikemas kini untuk rasa lebih 'native app' (menghalang zoom secara tidak sengaja) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEXUS IHSAN HMI IKN</title>
+    
+    <!-- ========================================== -->
+    <!-- TETAPAN FAVICON & ADD TO HOME SCREEN (APP) -->
+    <!-- ========================================== -->
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/1XyKdbY5/image.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/1XyKdbY5/image.png">
+    
+    <!-- Inline Web App Manifest (Base64) untuk PWA Standalone -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTkVYVVMgSUhTQU4gSE1JIElLTiIsInNob3J0X25hbWUiOiJOZXh1cyBJaHNhbiIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZjFmNWY5IiwidGhlbWVfY29sb3IiOiIjMDA1NWZmIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vaS5wb3N0aW1nLmNjLzFYeUtkYlk1L2ltYWdlLnBuZyIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+
+    <!-- Android / Chrome -->
+    <meta name="theme-color" content="#0055ff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Nexus Ihsan">
+    
+    <!-- iOS / Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Nexus Ihsan">
+
+    <!-- Tailwind CSS untuk pengayaan antaramuka -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tambahan PapaParse untuk membaca fail CSV terus dari Google Sheet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        gov: {
+                            blue: '#002b5e',
+                            light: '#f1f5f9',
+                            gold: '#d4af37',
+                        },
+                        brand: {
+                            blue: '#0055ff', // Warna biru baru untuk header
+                            dark: '#003ecc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Tambahan CSS kustom untuk kesan form */
+        .form-input {
+            transition: all 0.2s;
+        }
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gov-light text-slate-800 font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- ========================================== -->
+    <!-- 1. LAMAN UTAMA (LANDING PAGE)              -->
+    <!-- ========================================== -->
+    <div id="landingPage" class="flex flex-col min-h-screen items-center justify-center p-4 relative w-full">
+        <!-- Latar belakang korporat / abstrak -->
+        <div class="absolute inset-0 bg-[#0055ff]/5 pattern-dots pattern-blue-500 pattern-bg-white pattern-size-4 pattern-opacity-10 z-0"></div>
+        <div class="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-[#0055ff]/10 to-transparent z-0"></div>
+
+        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl max-w-md w-full text-center border-t-4 border-[#0055ff] relative z-10 animate-fade-in">
+            <!-- Logo Utama -->
+            <img src="https://i.postimg.cc/1XyKdbY5/image.png" alt="Logo KKM IKN" class="h-28 mx-auto mb-6 object-contain drop-shadow-sm">
+            
+            <h2 class="text-2xl font-bold text-slate-800 mb-1">NEXUS IHSAN HMI IKN</h2>
+            <p class="text-sm text-slate-500 mb-8 font-medium leading-relaxed">Unit Hal Ehwal Islam<br>Institut Kanser Negara</p>
+            
+            <div class="space-y-4">
+                <!-- Butang 1: Pendaftaran Program -->
+                <button onclick="showRegistrationForm()" class="w-full bg-brand-blue hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 transform hover:scale-[1.02]">
+                    <i class="fa-solid fa-clipboard-list text-lg"></i>
+                    Pendaftaran Program
+                </button>
+                
+                <!-- Butang Baru: Borang Penilaian -->
+                <a href="/borang-penilaian" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-3 border border-slate-200 transform hover:scale-[1.02]">
+                    <i class="fa-solid fa-clipboard-check text-lg text-emerald-600"></i>
+                    Borang Penilaian
+                </a>
+                
+                <!-- Butang 2: Rekod Kursus -->
+                <a href="/rekod-kursus" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-3 block border border-slate-200 transform hover:scale-[1.02]">
+                    <i class="fa-solid fa-folder-open text-lg text-amber-500"></i>
+                    Rekod Kursus
+                </a>
+            </div>
+            
+            <!-- Butang 3: ADMIN -->
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <button onclick="openAdminLogin()" class="w-full bg-white border-2 border-slate-200 hover:border-gov-blue hover:text-gov-blue text-slate-500 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                    Log Masuk Pentadbir (ADMIN)
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-10 text-center text-xs text-slate-500 relative z-10 font-medium tracking-wide">
+            &copy; 2026 Institut Kanser Negara. Hak Cipta Terpelihara.
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. HALAMAN BORANG PENDAFTARAN              -->
+    <!-- ========================================== -->
+    <div id="registrationPage" class="hidden flex-col min-h-screen w-full">
+        <form id="registrationForm" class="flex flex-col min-h-screen">
+            <!-- Bahagian Atas (Header Biru) mengikut screenshot -->
+            <div class="bg-[#0055ff] pt-12 pb-16 px-4 relative">
+                <!-- Butang Kembali -->
+                <button type="button" onclick="showLandingPage()" class="absolute top-4 left-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all backdrop-blur-sm shadow-sm font-medium text-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali
+                </button>
+
+                <div class="max-w-5xl mx-auto mt-6">
+                    <h1 class="text-3xl md:text-5xl font-bold text-white text-center mb-2 tracking-wide">NEXUS IHSAN HMI IKN</h1>
+                    <p class="text-white text-center text-lg mb-10">Unit Hal Ehwal Islam - Institut Kanser Negara</p>
+                    
+                    <!-- Dropdown Program -->
+                    <div class="relative max-w-4xl mx-auto mb-6">
+                        <select id="program" required class="w-full bg-[#1a65ff]/80 hover:bg-[#2b70ff] text-white text-center text-lg md:text-xl font-bold py-4 px-6 rounded-xl border-none outline-none focus:ring-2 focus:ring-white appearance-none cursor-pointer shadow-sm transition-colors uppercase">
+                            <option value="" class="text-slate-800 bg-white">-- SEDANG MEMUAT TURUN DATA PROGRAM... --</option>
+                        </select>
+                        <!-- Custom Arrow -->
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-white">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+
+                    <!-- Kad Butiran Program (4 Kad Putih) -->
+                    <div id="programDetailsCard" class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 hidden animate-fade-in">
+                        <div class="bg-white rounded-xl p-4 text-center shadow-md flex flex-col justify-center">
+                            <div class="text-[#0055ff] text-xs font-bold uppercase tracking-widest mb-1">Tarikh</div>
+                            <div id="detailTarikh" class="text-slate-800 font-bold md:text-lg break-words"></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 text-center shadow-md flex flex-col justify-center">
+                            <div class="text-[#0055ff] text-xs font-bold uppercase tracking-widest mb-1">Hari</div>
+                            <div id="detailHari" class="text-slate-800 font-bold md:text-lg break-words"></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 text-center shadow-md flex flex-col justify-center">
+                            <div class="text-[#0055ff] text-xs font-bold uppercase tracking-widest mb-1">Masa</div>
+                            <div id="detailMasa" class="text-slate-800 font-bold md:text-lg break-words"></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 text-center shadow-md flex flex-col justify-center">
+                            <div class="text-[#0055ff] text-xs font-bold uppercase tracking-widest mb-1">Lokasi</div>
+                            <div id="detailLokasi" class="text-slate-800 font-bold md:text-lg leading-tight break-words"></div>
+                        </div>
+
+                        <!-- Penerangan -->
+                        <div class="col-span-2 md:col-span-4 mt-2">
+                            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                                <div class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">Penerangan</div>
+                                <div id="detailPenerangan" class="text-white text-sm break-words"></div>
+                            </div>
+                        </div>
+
+                        <!-- Jumlah Pendaftaran -->
+                        <div class="col-span-2 md:col-span-4 mt-2">
+                            <div class="bg-[#1a65ff]/40 border border-[#1a65ff] rounded-xl p-3 flex flex-col sm:flex-row items-center justify-center gap-3 shadow-inner">
+                                <div class="flex items-center gap-2 text-white">
+                                    <i class="fa-solid fa-users"></i>
+                                    <span class="text-sm font-medium tracking-wide">Jumlah Peserta Berdaftar:</span>
+                                </div>
+                                <span id="detailJumlahDaftar" class="bg-white text-[#0055ff] font-bold px-4 py-1 rounded-full text-sm shadow-sm">
+                                    Memuat turun...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <main class="flex-grow p-4 md:p-8 -mt-6">
+                <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 relative z-10">
+                    <div class="p-6 md:p-8 space-y-8">
+
+                    <!-- Bahagian 2: Maklumat Peserta -->
+                    <section>
+                        <h4 class="text-md font-semibold text-slate-700 border-b border-slate-200 pb-2 mb-4">Maklumat Peserta</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Nama Penuh -->
+                            <div class="md:col-span-2">
+                                <label for="nama" class="block text-sm font-medium text-slate-700 mb-1">Nama Penuh (Seperti dalam K/P) <span class="text-red-500">*</span></label>
+                                <input type="text" id="nama" list="namaList" placeholder="Cari nama sedia ada atau taip nama baharu..." required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none uppercase" autocomplete="off">
+                                <datalist id="namaList">
+                                    <!-- Senarai akan dijana oleh JS -->
+                                </datalist>
+                                <p class="text-xs text-slate-500 mt-1">Sertakan Bin / Binti. Jantina akan dikesan secara automatik.</p>
+                            </div>
+
+                            <!-- No KP -->
+                            <div>
+                                <label for="ic" class="block text-sm font-medium text-slate-700 mb-1">No Kad Pengenalan <span class="text-red-500">*</span></label>
+                                <input type="text" id="ic" placeholder="987654-32-9876" maxlength="14" required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none">
+                                <p class="text-xs text-slate-500 mt-1">Umur akan dikira secara automatik.</p>
+                            </div>
+
+                            <!-- Umur (Auto) -->
+                            <div>
+                                <label for="umur" class="block text-sm font-medium text-slate-700 mb-1">Umur</label>
+                                <input type="text" id="umur" readonly class="form-input w-full rounded-md border-slate-200 bg-slate-100 shadow-sm px-4 py-2 border text-slate-600 cursor-not-allowed font-semibold">
+                            </div>
+
+                            <!-- Jantina (Auto/Manual) -->
+                            <div>
+                                <label for="jantina" class="block text-sm font-medium text-slate-700 mb-1">Jantina <span class="text-red-500">*</span></label>
+                                <select id="jantina" required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none">
+                                    <option value="">-- Pilih Jantina --</option>
+                                    <option value="Lelaki">Lelaki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+
+                            <!-- Emel -->
+                            <div>
+                                <label for="emel" class="block text-sm font-medium text-slate-700 mb-1">Alamat Emel <span class="text-red-500">*</span></label>
+                                <input type="email" id="emel" placeholder="emel@moh.gov.my" required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none">
+                            </div>
+
+                            <!-- No Tel bimbit -->
+                            <div>
+                                <label for="telefon" class="block text-sm font-medium text-slate-700 mb-1">No Telefon Bimbit <span class="text-red-500">*</span></label>
+                                <input type="tel" id="telefon" placeholder="012-3456789" required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none">
+                            </div>
+
+                            <!-- Jabatan -->
+                            <div>
+                                <label for="jabatan" class="block text-sm font-medium text-slate-700 mb-1">Jabatan / Bahagian <span class="text-red-500">*</span></label>
+                                <select id="jabatan" required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none overflow-hidden">
+                                    <option value="">-- Sedang memuat turun data... --</option>
+                                </select>
+                            </div>
+
+                            <!-- Jawatan -->
+                            <div>
+                                <label for="jawatan" class="block text-sm font-medium text-slate-700 mb-1">Jawatan / Gred <span class="text-red-500">*</span></label>
+                                <select id="jawatan" required class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none overflow-hidden">
+                                    <option value="">-- Sedang memuat turun data... --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="pt-4 flex justify-end">
+                        <button type="submit" class="bg-gov-blue hover:bg-blue-800 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Hantar Pendaftaran
+                        </button>
+                    </div>
+
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-slate-800 text-slate-300 py-6 mt-auto">
+                <div class="max-w-4xl mx-auto px-4 text-center text-sm">
+                    <p>&copy; 2026 Institut Kanser Negara. Hak Cipta Terpelihara.</p>
+                    <p class="text-slate-500 mt-1 text-xs">Unit Hal Ehwal Islam, IKN. Dibangunkan untuk kemudahan dalaman.</p>
+                </div>
+            </footer>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SEMUA MODAL POPUP                          -->
+    <!-- ========================================== -->
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                <i class="fa-solid fa-check text-2xl text-green-600"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Pendaftaran Berjaya!</h3>
+            <p class="text-sm text-slate-600 mb-6">Terima kasih. Pendaftaran anda untuk program tersebut telah direkodkan ke dalam sistem kami.</p>
+            <button onclick="closeModal()" class="w-full bg-gov-blue hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                Tutup & Kembali
+            </button>
+        </div>
+    </div>
+
+    <!-- Generic Message Box (Custom Alert) -->
+    <div id="customMessageBox" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 text-center transform scale-95 transition-transform duration-300" id="msgBoxContent">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4 text-gov-blue">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2" id="msgBoxTitle">Makluman</h3>
+            <p class="text-sm text-slate-600 mb-6" id="msgBoxText"></p>
+            <button onclick="closeMessageBox()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 z-[55] hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 transform transition-all relative">
+            <button type="button" onclick="closeAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-gov-blue"></i> Log Masuk Pentadbir</h3>
+            <div class="mb-4">
+                <label for="adminPasswordInput" class="block text-sm font-medium text-slate-700 mb-1">Kata Laluan</label>
+                <input type="password" id="adminPasswordInput" class="form-input w-full rounded-md border-slate-300 shadow-sm px-4 py-2 border text-slate-700 focus:border-blue-500 focus:outline-none" placeholder="Masukkan kata laluan...">
+            </div>
+            <button onclick="checkAdminPassword()" class="w-full bg-gov-blue hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                Log Masuk
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-black bg-opacity-60 z-[55] hidden flex items-center justify-center backdrop-blur-sm p-2 md:p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl my-auto transform transition-all relative flex flex-col max-h-[95vh]">
+            <div class="flex justify-between items-center bg-slate-800 text-white p-4 rounded-t-xl shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-gear"></i> Konfigurasi Pentadbir</h3>
+                <button onclick="closeAdminPanel()" class="hover:text-red-400 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="p-4 md:p-6 overflow-y-auto flex-grow">
+                <!-- Tabs -->
+                <div class="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                    <button id="tabBtnProg" onclick="switchAdminTab('prog')" class="px-4 py-2 text-gov-blue font-bold border-b-2 border-gov-blue transition-colors whitespace-nowrap">Tambah Program</button>
+                    <button id="tabBtnConfig" onclick="switchAdminTab('config')" class="px-4 py-2 text-slate-500 font-medium hover:text-gov-blue transition-colors whitespace-nowrap">Jabatan & Jawatan</button>
+                    <button id="tabBtnPass" onclick="switchAdminTab('pass')" class="px-4 py-2 text-slate-500 font-medium hover:text-gov-blue transition-colors whitespace-nowrap">Tukar Kata Laluan</button>
+                </div>
+                
+                <!-- Tab 1: Tambah Program & Jadual (Dibalut dlm satu div) -->
+                <div id="tabContentProg" class="block">
+                    <form id="formAdminProg" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Program</label>
+                                <input type="text" id="adminProgNama" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarikh Program</label>
+                                <input type="date" id="adminProgTarikh" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Hari (Automatik)</label>
+                                <input type="text" id="adminProgHari" required readonly class="form-input w-full rounded-md border-slate-200 bg-slate-100 px-3 py-2 border text-slate-600 outline-none cursor-not-allowed font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Masa Mula</label>
+                                <input type="time" id="adminProgMasaMula" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Masa Akhir</label>
+                                <input type="time" id="adminProgMasaAkhir" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none cursor-pointer">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Lokasi</label>
+                                <input type="text" id="adminProgLokasi" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Penerangan</label>
+                                <textarea id="adminProgPenerangan" rows="3" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none"></textarea>
+                            </div>
+                        </div>
+                        <div class="pt-2 flex justify-end gap-2 flex-wrap">
+                            <button type="button" id="btnCancelEditProgram" onclick="cancelEditProgram()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-6 rounded-lg transition-colors">
+                                Batal Edit
+                            </button>
+                            <button type="submit" id="btnSubmitProgram" class="bg-gov-blue hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> <span id="textSubmitProgram">Simpan Program Baharu</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Table Senarai Program -->
+                    <div class="mt-8">
+                        <h4 class="font-bold text-slate-700 mb-4 border-b pb-2"><i class="fa-solid fa-list-check"></i> Senarai Program Sedia Ada</h4>
+                        <!-- Tambah overflow-x-auto untuk mobile scroll mendatar -->
+                        <div class="overflow-x-auto border rounded-lg bg-slate-50">
+                            <!-- Letak min-w-[600px] agar tak hancur bila di telefon -->
+                            <table class="w-full min-w-[600px] text-sm text-left text-slate-600">
+                                <thead class="bg-slate-200 text-slate-700">
+                                    <tr>
+                                        <th class="px-4 py-3 border-b w-2/5">Nama Program</th>
+                                        <th class="px-4 py-3 border-b w-2/5">Tarikh & Masa</th>
+                                        <th class="px-4 py-3 border-b text-center w-1/5">Tindakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminProgramTableBody" class="divide-y divide-slate-200 bg-white">
+                                    <!-- Data akan dijana oleh JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Tambah Jabatan & Jawatan -->
+                <div id="formAdminConfig" class="hidden h-full flex flex-col">
+                    <form id="formAdminConfigSubmit" class="space-y-4">
+                        <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg mb-4 text-sm text-blue-800 break-words">
+                            <i class="fa-solid fa-circle-info mr-2"></i> Konfigurasi baharu ini akan disalurkan terus ke pangkalan data Jabatan & Jawatan.
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Jabatan Baharu</label>
+                                <input type="text" id="adminJabatan" class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none" placeholder="Cth: Jabatan Kardiologi">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Jawatan Baharu</label>
+                                <input type="text" id="adminJawatan" class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none" placeholder="Cth: Pegawai Optometri">
+                            </div>
+                        </div>
+                        <div class="pt-2 flex justify-end">
+                            <button type="submit" class="bg-gov-blue hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Simpan Konfigurasi Baharu
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- List Senarai Jabatan & Jawatan -->
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
+                        <div class="flex flex-col">
+                            <h4 class="font-bold text-slate-700 mb-4 border-b pb-2 shrink-0"><i class="fa-regular fa-building"></i> Senarai Jabatan</h4>
+                            <!-- Tetap tinggi ideal pada 72 agar selesa di desktop dan ada scroll -->
+                            <div class="bg-white border rounded-lg h-72 overflow-y-auto">
+                                <ul id="adminJabatanList" class="divide-y divide-slate-100 text-sm flex flex-col">
+                                    <!-- Data akan dijana oleh JS -->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="font-bold text-slate-700 mb-4 border-b pb-2 shrink-0"><i class="fa-solid fa-user-doctor"></i> Senarai Jawatan</h4>
+                            <div class="bg-white border rounded-lg h-72 overflow-y-auto">
+                                <ul id="adminJawatanList" class="divide-y divide-slate-100 text-sm flex flex-col">
+                                    <!-- Data akan dijana oleh JS -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Tukar Kata Laluan -->
+                <div id="tabContentPass" class="hidden">
+                    <form id="formAdminPass" class="space-y-4 max-w-lg mx-auto mt-4 p-6 bg-slate-50 rounded-xl border border-slate-200">
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-4 text-sm text-amber-800 break-words flex gap-3">
+                            <i class="fa-solid fa-triangle-exclamation mt-1"></i> 
+                            <span>Sila pastikan anda mengingati kata laluan baharu ini untuk log masuk seterusnya.</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Kata Laluan Semasa</label>
+                            <input type="password" id="adminPassCurrent" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none">
+                        </div>
+                        <div class="pt-2">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Kata Laluan Baharu</label>
+                            <input type="password" id="adminPassNew" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Sahkan Kata Laluan Baharu</label>
+                            <input type="password" id="adminPassConfirm" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-black text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-key"></i> Kemaskini Kata Laluan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Konfigurasi Modal (Satu Input) -->
+    <div id="editSingleConfigModal" class="fixed inset-0 bg-black bg-opacity-60 z-[70] hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 transform transition-all relative">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2" id="editSingleConfigTitle">Kemaskini</h3>
+            <form id="formEditSingleConfig">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Baharu</label>
+                    <textarea id="editSingleConfigInput" rows="2" required class="form-input w-full rounded-md border-slate-300 px-3 py-2 border text-slate-700 focus:border-blue-500 outline-none resize-none"></textarea>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeEditSingleConfig()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors">Batal</button>
+                    <button type="submit" class="bg-brand-blue hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Kemaskini</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Logik -->
+    <script>
+        // Data Globals
+        let programData = {};
+        let pendaftaranCount = {};
+        let pesertaDataMap = {}; 
+        let globalProgramList = [];
+        let globalJabatanList = [];
+        let globalJawatanList = [];
+        let currentEditProgramOriginalName = null;
+        let currentEditSingleConfigType = null;
+        let currentEditSingleConfigOriginal = null;
+        let adminPasswordValid = "";
+
+        const URL_CSV_PROGRAM = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=553481558&single=true&output=csv";
+        const URL_CSV_JABATAN_JAWATAN = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=1373588222&single=true&output=csv";
+        const URL_CSV_PENDAFTARAN = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=484739154&single=true&output=csv";
+        const URL_CSV_PASSWORD = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=1115788942&single=true&output=csv";
+        const URL_CSV_NAMA_PESERTA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=2136076301&single=true&output=csv";
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLioAnPFPRKLPgTgD2bgZez4zgNMUBALL_tbI8RvYHsn-YunDbABkkLNxYp08EuoCldg/exec";
+
+        // ==========================================
+        // INIT & EVENT LISTENERS
+        // ==========================================
+        window.onload = function() {
+            // Load Admin Password
+            Papa.parse(URL_CSV_PASSWORD, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    const data = results.data;
+                    for(let i=0; i<data.length; i++) {
+                        let cell = data[i][0];
+                        if(cell && cell.toLowerCase() !== 'password') {
+                            adminPasswordValid = cell.trim();
+                            break;
+                        }
+                    }
+                }
+            });
+
+            // Mula Muat Turun Data Asas
+            loadAllData();
+            setupEventListeners();
+        };
+
+        function setupEventListeners() {
+            // 1. Program Dropdown On Change
+            const selectProgram = document.getElementById('program');
+            if(selectProgram) {
+                selectProgram.addEventListener('change', function() {
+                    const val = this.value;
+                    const cardDetails = document.getElementById('programDetailsCard');
+                    if(val && programData[val]) {
+                        const data = programData[val];
+                        document.getElementById('detailTarikh').textContent = data.tarikh || '-';
+                        document.getElementById('detailHari').textContent = data.hari || '-';
+                        document.getElementById('detailMasa').textContent = `${data.masaMula || '-'} - ${data.masaTamat || '-'}`;
+                        document.getElementById('detailLokasi').textContent = data.lokasi || '-';
+                        document.getElementById('detailPenerangan').textContent = data.penerangan || "Tiada penerangan disediakan.";
+                        
+                        const namaProgramSemasa = data.nama.trim();
+                        const jumlahBerdaftar = pendaftaranCount[namaProgramSemasa] || 0;
+                        document.getElementById('detailJumlahDaftar').textContent = jumlahBerdaftar + " Orang";
+                        
+                        if(cardDetails) cardDetails.classList.remove('hidden');
+                    } else {
+                        if(cardDetails) cardDetails.classList.add('hidden');
+                    }
+                });
+            }
+
+            // 2. Auto Jantina dan Auto-Fill Maklumat Peserta
+            const inputNama = document.getElementById('nama');
+            if(inputNama) {
+                inputNama.addEventListener('input', function() {
+                    const val = this.value.toUpperCase().trim();
+                    
+                    if (pesertaDataMap[val]) {
+                        const dataRow = pesertaDataMap[val];
+                        const keys = Object.keys(dataRow);
+                        
+                        const icKey = keys.find(k => k.toLowerCase().includes('k/p') || k.toLowerCase().includes('kad pengenalan') || k.toLowerCase().includes('ic'));
+                        const telKey = keys.find(k => k.toLowerCase().includes('telefon') || k.toLowerCase().includes('tel') || k.toLowerCase().includes('hp'));
+                        const jabKey = keys.find(k => k.toLowerCase().includes('jabatan') || k.toLowerCase().includes('bahagian'));
+                        
+                        const jawatanKey = keys.length > 4 ? keys[4] : null;
+                        const emelKey = keys.length > 6 ? keys[6] : null;
+                        
+                        if (icKey && dataRow[icKey]) {
+                            const icInput = document.getElementById('ic');
+                            if (icInput) {
+                                icInput.value = dataRow[icKey];
+                                icInput.dispatchEvent(new Event('input')); 
+                            }
+                        }
+                        if (emelKey && dataRow[emelKey]) {
+                            const emelInput = document.getElementById('emel');
+                            if (emelInput) emelInput.value = dataRow[emelKey];
+                        }
+                        if (telKey && dataRow[telKey]) {
+                            const telInput = document.getElementById('telefon');
+                            if (telInput) telInput.value = dataRow[telKey];
+                        }
+                        if (jabKey && dataRow[jabKey]) {
+                            const jabInput = document.getElementById('jabatan');
+                            if (jabInput) {
+                                let optionExists = Array.from(jabInput.options).some(opt => opt.value === dataRow[jabKey]);
+                                if (!optionExists) {
+                                    const newOpt = document.createElement('option');
+                                    newOpt.value = dataRow[jabKey];
+                                    newOpt.textContent = dataRow[jabKey];
+                                    jabInput.appendChild(newOpt);
+                                }
+                                jabInput.value = dataRow[jabKey];
+                            }
+                        }
+                        if (jawatanKey && dataRow[jawatanKey]) {
+                            const jawInput = document.getElementById('jawatan');
+                            if (jawInput) {
+                                let optionExists = Array.from(jawInput.options).some(opt => opt.value === dataRow[jawatanKey]);
+                                if (!optionExists) {
+                                    const newOpt = document.createElement('option');
+                                    newOpt.value = dataRow[jawatanKey];
+                                    newOpt.textContent = dataRow[jawatanKey];
+                                    jawInput.appendChild(newOpt);
+                                }
+                                jawInput.value = dataRow[jawatanKey];
+                            }
+                        }
+                    }
+
+                    const namaLower = this.value.toLowerCase();
+                    const selectJantina = document.getElementById('jantina');
+                    if(selectJantina) {
+                        if (/\bbin\b/.test(namaLower)) {
+                            selectJantina.value = "Lelaki";
+                        } else if (/\bbinti\b/.test(namaLower) || /\bbte\b/.test(namaLower)) {
+                            selectJantina.value = "Perempuan";
+                        }
+                    }
+                });
+            }
+
+            // 3. Auto Format IC
+            const inputIc = document.getElementById('ic');
+            if(inputIc) {
+                inputIc.addEventListener('input', function(e) {
+                    let value = this.value.replace(/\D/g, '');
+                    if(value.length > 12) value = value.substring(0, 12);
+                    
+                    let formatted = value;
+                    if (value.length > 6) formatted = value.substring(0, 6) + '-' + value.substring(6);
+                    if (value.length > 8) formatted = formatted.substring(0, 9) + '-' + value.substring(8);
+                    
+                    this.value = formatted;
+                    const inputUmur = document.getElementById('umur');
+                    if(inputUmur) {
+                        if (value.length >= 2) {
+                            const tahunLahirStr = value.substring(0, 2);
+                            let tahunLahir = parseInt(tahunLahirStr);
+                            const tahunTerkini = 2026;
+                            if (tahunLahir > 26) tahunLahir += 1900; else tahunLahir += 2000;
+                            inputUmur.value = (tahunTerkini - tahunLahir) + " Tahun";
+                        } else {
+                            inputUmur.value = "";
+                        }
+                    }
+                });
+            }
+
+            // 4. Form Registration (Public)
+            const registrationForm = document.getElementById('registrationForm');
+            if(registrationForm) {
+                registrationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Menghantar...';
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
+                    const formData = new URLSearchParams();
+                    const programEl = document.getElementById('program');
+                    formData.append('action', 'register');
+                    formData.append('program', programEl.options[programEl.selectedIndex].text); 
+                    formData.append('nama', document.getElementById('nama').value);
+                    formData.append('ic', document.getElementById('ic').value);
+                    formData.append('umur', document.getElementById('umur').value);
+                    formData.append('jantina', document.getElementById('jantina').value);
+                    formData.append('emel', document.getElementById('emel').value);
+                    formData.append('telefon', document.getElementById('telefon').value);
+                    formData.append('jabatan', document.getElementById('jabatan').value);
+                    formData.append('jawatan', document.getElementById('jawatan').value);
+
+                    fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.result === "success") {
+                            const modal = document.getElementById('successModal');
+                            if(modal) {
+                                modal.classList.remove('hidden');
+                                setTimeout(() => {
+                                    document.getElementById('modalContent').classList.remove('scale-95');
+                                    document.getElementById('modalContent').classList.add('scale-100');
+                                }, 10);
+                            }
+                        } else {
+                            showCustomAlert("Pendaftaran Gagal", data.message);
+                        }
+                    })
+                    .catch(error => {
+                        showCustomAlert("Ralat Pelayan", "Sila semak pautan Apps Script anda.");
+                    })
+                    .finally(() => {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    });
+                });
+            }
+
+            // 5. Admin Form Prog
+            const formAdminProg = document.getElementById('formAdminProg');
+            if(formAdminProg) {
+                formAdminProg.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+                    btn.disabled = true;
+
+                    const formData = new URLSearchParams();
+                    if (currentEditProgramOriginalName) {
+                        formData.append('action', 'editProgram');
+                        formData.append('original_nama', currentEditProgramOriginalName);
+                    } else {
+                        formData.append('action', 'addProgram');
+                    }
+
+                    const formattedTarikh = formatDateToMalay(document.getElementById('adminProgTarikh').value);
+                    const formattedMasaMula = formatTime(document.getElementById('adminProgMasaMula').value);
+                    const formattedMasaAkhir = formatTime(document.getElementById('adminProgMasaAkhir').value);
+
+                    const localDataInfo = {
+                        'Nama Program': document.getElementById('adminProgNama').value,
+                        'Tarikh': formattedTarikh,
+                        'Hari': document.getElementById('adminProgHari').value,
+                        'Masa Mula': formattedMasaMula,
+                        'Masa Akhir': formattedMasaAkhir,
+                        'Lokasi': document.getElementById('adminProgLokasi').value,
+                        'Penerangan': document.getElementById('adminProgPenerangan').value
+                    };
+
+                    for (const [key, value] of Object.entries(localDataInfo)) {
+                        formData.append(key.toLowerCase().replace(' ', '_'), value);
+                    }
+
+                    fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.result === "success") {
+                            showCustomAlert("Berjaya", "Program berjaya disimpan.");
+                            if(currentEditProgramOriginalName) {
+                                const idx = globalProgramList.findIndex(p => p['Nama Program'] === currentEditProgramOriginalName);
+                                if(idx !== -1) globalProgramList[idx] = localDataInfo;
+                            } else {
+                                globalProgramList.push(localDataInfo);
+                            }
+                            renderAdminProgramList();
+                            cancelEditProgram();
+                        } else {
+                            showCustomAlert("Ralat", data.message);
+                        }
+                    })
+                    .catch(() => {
+                        showCustomAlert("Ralat Server", "Ralat sistem Apps Script.");
+                    })
+                    .finally(() => { 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false; 
+                    });
+                });
+            }
+
+            // 6. Admin Program Tarikh & Hari Auto
+            const adminProgTarikh = document.getElementById('adminProgTarikh');
+            if(adminProgTarikh) {
+                adminProgTarikh.addEventListener('change', function() {
+                    if(this.value) {
+                        const d = new Date(this.value);
+                        const days = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+                        const hariInput = document.getElementById('adminProgHari');
+                        if(hariInput) hariInput.value = days[d.getDay()];
+                    } else {
+                        const hariInput = document.getElementById('adminProgHari');
+                        if(hariInput) hariInput.value = "";
+                    }
+                });
+            }
+
+            // 7. Admin Form Config
+            const formAdminConfigSubmit = document.getElementById('formAdminConfigSubmit');
+            if(formAdminConfigSubmit) {
+                formAdminConfigSubmit.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+                    btn.disabled = true;
+
+                    const newJab = document.getElementById('adminJabatan').value.trim();
+                    const newJaw = document.getElementById('adminJawatan').value.trim();
+
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'addConfig');
+                    formData.append('jabatan', newJab);
+                    formData.append('jawatan', newJaw);
+
+                    fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.result === "success") {
+                            showCustomAlert("Berjaya", "Konfigurasi baharu ditambah.");
+                            if(newJab !== '' && !globalJabatanList.includes(newJab)) globalJabatanList.push(newJab);
+                            if(newJaw !== '' && !globalJawatanList.includes(newJaw)) globalJawatanList.push(newJaw);
+                            renderAdminConfigList();
+                            renderDropdownConfig();
+                            this.reset();
+                        } else {
+                            showCustomAlert("Ralat", data.message);
+                        }
+                    })
+                    .catch(() => {
+                        showCustomAlert("Ralat Server", "Ralat sistem Apps Script.");
+                    })
+                    .finally(() => { 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false; 
+                    });
+                });
+            }
+
+            // 8. Admin Edit Single
+            const formEditSingleConfig = document.getElementById('formEditSingleConfig');
+            if(formEditSingleConfig) {
+                formEditSingleConfig.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                    btn.disabled = true;
+
+                    const newValue = document.getElementById('editSingleConfigInput').value.trim();
+                    const formData = new URLSearchParams();
+                    
+                    if (currentEditSingleConfigType === 'Jabatan') {
+                        formData.append('action', 'editJabatan');
+                        formData.append('original_jabatan', currentEditSingleConfigOriginal);
+                        formData.append('new_jabatan', newValue);
+                    } else {
+                        formData.append('action', 'editJawatan');
+                        formData.append('original_jawatan', currentEditSingleConfigOriginal);
+                        formData.append('new_jawatan', newValue);
+                    }
+
+                    fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.result === "success") {
+                            closeEditSingleConfig();
+                            showCustomAlert("Berjaya", `${currentEditSingleConfigType} telah dikemaskini.`);
+                            if(currentEditSingleConfigType === 'Jabatan') {
+                                const idx = globalJabatanList.indexOf(currentEditSingleConfigOriginal);
+                                if(idx !== -1) globalJabatanList[idx] = newValue;
+                            } else {
+                                const idx = globalJawatanList.indexOf(currentEditSingleConfigOriginal);
+                                if(idx !== -1) globalJawatanList[idx] = newValue;
+                            }
+                            renderAdminConfigList();
+                            renderDropdownConfig();
+                        } else {
+                            showCustomAlert("Ralat", data.message);
+                        }
+                    })
+                    .catch(() => {
+                        showCustomAlert("Ralat Server", "Ralat sistem Apps Script.");
+                    })
+                    .finally(() => { 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false; 
+                    });
+                });
+            }
+
+            // 9. Admin Form Pass
+            const formAdminPass = document.getElementById('formAdminPass');
+            if(formAdminPass) {
+                formAdminPass.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const currentPass = document.getElementById('adminPassCurrent').value;
+                    const newPass = document.getElementById('adminPassNew').value;
+                    const confirmPass = document.getElementById('adminPassConfirm').value;
+
+                    if (currentPass !== adminPasswordValid) {
+                        showCustomAlert("Akses Ditolak", "Kata laluan semasa yang dimasukkan adalah salah.");
+                        return;
+                    }
+                    if (newPass !== confirmPass) {
+                        showCustomAlert("Ralat", "Kata laluan baharu dan pengesahan tidak sepadan.");
+                        return;
+                    }
+
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+                    btn.disabled = true;
+
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'changePassword');
+                    formData.append('new_password', newPass);
+
+                    fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.result === "success") {
+                            showCustomAlert("Berjaya", "Kata laluan sistem telah berjaya dikemas kini.");
+                            adminPasswordValid = newPass;
+                            this.reset();
+                        } else {
+                            showCustomAlert("Ralat", data.message);
+                        }
+                    })
+                    .catch(() => {
+                        showCustomAlert("Ralat Server", "Ralat sistem Apps Script.");
+                    })
+                    .finally(() => { 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false; 
+                    });
+                });
+            }
+        }
+
+        // ==========================================
+        // HELPERS: FORMAT & PARSE DATE/TIME
+        // ==========================================
+        function formatDateToMalay(dateStr) {
+            if(!dateStr) return "";
+            const parts = dateStr.split('-');
+            if(parts.length !== 3) return dateStr;
+            const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+            return `${parseInt(parts[2], 10)} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
+        }
+
+        function parseMalayDateToYMD(malayDate) {
+            if(!malayDate) return "";
+            if (malayDate.includes('-') && malayDate.split('-')[0].length === 4) return malayDate;
+            const parts = malayDate.trim().split(/\s+|[-/]/);
+            if(parts.length < 3) return "";
+            const months = { "januari":"01", "jan":"01", "februari":"02", "feb":"02", "mac":"03", "april":"04", "apr":"04", "mei":"05", "jun":"06", "julai":"07", "jul":"07", "ogos":"08", "september":"09", "sep":"09", "oktober":"10", "okt":"10", "november":"11", "nov":"11", "disember":"12", "dis":"12" };
+            let d = parts[0].replace(/\D/g, '').padStart(2, '0');
+            let m = months[parts[1].toLowerCase()] || "01";
+            let y = parts[2].replace(/\D/g, '');
+            return `${y}-${m}-${d}`;
+        }
+
+        function formatTime(timeStr) {
+            if(!timeStr) return "";
+            if(timeStr.toLowerCase().includes('pagi') || timeStr.toLowerCase().includes('petang')) return timeStr;
+            let parts = timeStr.split(':');
+            if(parts.length < 2) return timeStr;
+            let h = parseInt(parts[0], 10);
+            let m = parts[1];
+            let suffix = "Pagi";
+            if (h >= 12) {
+                if (h >= 12 && h < 14) suffix = "Tengahari";
+                else if (h >= 14 && h < 19) suffix = "Petang";
+                else suffix = "Malam";
+                if (h > 12) h -= 12;
+            } else if (h === 0) {
+                h = 12;
+            }
+            return `${h.toString().padStart(2, '0')}:${m} ${suffix}`;
+        }
+
+        function parseTime(timeStr) {
+            if(!timeStr) return "";
+            const match = timeStr.trim().match(/(\d{1,2})[:\.](\d{2})\s*([a-zA-Z]+)?/);
+            if(!match) {
+                if(timeStr.includes(':') && timeStr.length <= 5) return timeStr;
+                return ""; 
+            }
+            let h = parseInt(match[1], 10);
+            let m = match[2];
+            let suffix = (match[3] || "").toLowerCase();
+            if (suffix.includes("petang") || suffix.includes("malam") || suffix.includes("pm")) {
+                if (h < 12) h += 12;
+            } else if (suffix.includes("pagi") || suffix.includes("am")) {
+                if (h === 12) h = 0;
+            } else if (suffix.includes("tengahari")) {
+                if (h !== 12) h += 12;
+            }
+            return `${h.toString().padStart(2, '0')}:${m}`;
+        }
+
+        // ==========================================
+        // UI NAVIGATION FUNCTIONS
+        // ==========================================
+        function showRegistrationForm() {
+            const landingPage = document.getElementById('landingPage');
+            const regPage = document.getElementById('registrationPage');
+            
+            if(landingPage) {
+                landingPage.classList.add('hidden');
+                landingPage.classList.remove('flex');
+            }
+            if(regPage) {
+                regPage.classList.remove('hidden');
+                regPage.classList.add('flex');
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showLandingPage() {
+            const landingPage = document.getElementById('landingPage');
+            const regPage = document.getElementById('registrationPage');
+            
+            if(regPage) {
+                regPage.classList.add('hidden');
+                regPage.classList.remove('flex');
+            }
+            if(landingPage) {
+                landingPage.classList.remove('hidden');
+                landingPage.classList.add('flex');
+            }
+        }
+
+        // ==========================================
+        // UI & FETCH FUNCTIONS
+        // ==========================================
+        function loadAllData() {
+            Papa.parse(URL_CSV_PROGRAM, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    const data = results.data;
+                    const selectProgram = document.getElementById('program');
+                    if(selectProgram) {
+                        selectProgram.innerHTML = '<option value="" class="text-slate-800 bg-white">-- SILA PILIH PROGRAM --</option>';
+                    }
+                    programData = {};
+                    
+                    globalProgramList = data.filter(row => row['Nama Program'] && row['Nama Program'].trim() !== '');
+                    renderAdminProgramList();
+
+                    data.forEach((row, index) => {
+                        if(row['Nama Program']) {
+                            const progId = 'prog_' + index;
+                            programData[progId] = {
+                                nama: row['Nama Program'],
+                                tarikh: row['Tarikh'],
+                                hari: row['Hari'],
+                                masaMula: row['Masa Mula'],
+                                masaTamat: row['Masa Akhir'],
+                                lokasi: row['Lokasi'],
+                                penerangan: row['Penerangan']
+                            };
+                            if(selectProgram) {
+                                const opt = document.createElement('option');
+                                opt.value = progId;
+                                opt.textContent = row['Nama Program'];
+                                opt.className = "text-slate-800 bg-white uppercase";
+                                selectProgram.appendChild(opt);
+                            }
+                        }
+                    });
+                },
+                error: function() {
+                    const selectProgram = document.getElementById('program');
+                    if(selectProgram) selectProgram.innerHTML = '<option value="">RALAT MEMUAT TURUN DATA PROGRAM</option>';
+                }
+            });
+
+            Papa.parse(URL_CSV_JABATAN_JAWATAN, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    const data = results.data;
+                    let senaraiJabatan = [];
+                    let senaraiJawatan = [];
+                    
+                    data.forEach((row, index) => {
+                        if (index === 0) return; 
+                        if(row[0] && row[0].trim() !== '') senaraiJabatan.push(row[0].trim());
+                        if(row[1] && row[1].trim() !== '') senaraiJawatan.push(row[1].trim());
+                    });
+                    
+                    globalJabatanList = [...new Set(senaraiJabatan)];
+                    globalJawatanList = [...new Set(senaraiJawatan)];
+                    
+                    renderAdminConfigList();
+                    renderDropdownConfig();
+                },
+                error: function() {
+                    const selectJabatan = document.getElementById('jabatan');
+                    const selectJawatan = document.getElementById('jawatan');
+                    if(selectJabatan) selectJabatan.innerHTML = '<option value="">Ralat</option>';
+                    if(selectJawatan) selectJawatan.innerHTML = '<option value="">Ralat</option>';
+                }
+            });
+
+            Papa.parse(URL_CSV_PENDAFTARAN, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    const data = results.data;
+                    pendaftaranCount = {}; 
+                    data.forEach(row => {
+                        const namaProg = row['Nama Program'];
+                        if (namaProg) {
+                            const cleanName = namaProg.trim();
+                            if (!pendaftaranCount[cleanName]) pendaftaranCount[cleanName] = 0;
+                            pendaftaranCount[cleanName]++;
+                        }
+                    });
+                }
+            });
+
+            Papa.parse(URL_CSV_NAMA_PESERTA, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    const data = results.data;
+                    const namaList = document.getElementById('namaList');
+                    if(!namaList) return;
+                    
+                    namaList.innerHTML = '';
+                    let senaraiNama = [];
+                    pesertaDataMap = {}; 
+                    
+                    data.forEach((row) => {
+                        const keys = Object.keys(row);
+                        if (keys.length === 0) return;
+                        
+                        const namaKey = keys.find(k => k.toLowerCase().includes('nama')) || keys[0];
+                        const nama = row[namaKey];
+                        
+                        if(nama && nama.trim() !== '') {
+                            const cleanNama = nama.trim().toUpperCase();
+                            if(!senaraiNama.includes(cleanNama)) {
+                                senaraiNama.push(cleanNama);
+                                pesertaDataMap[cleanNama] = row; 
+                            }
+                        }
+                    });
+                    
+                    senaraiNama.forEach(nama => {
+                        const opt = document.createElement('option');
+                        opt.value = nama;
+                        namaList.appendChild(opt);
+                    });
+                },
+                error: function() {
+                    console.error("Ralat memuat turun senarai nama.");
+                }
+            });
+        }
+
+        function renderDropdownConfig() {
+            const selectJabatan = document.getElementById('jabatan');
+            const selectJawatan = document.getElementById('jawatan');
+            if(!selectJabatan || !selectJawatan) return;
+
+            selectJabatan.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            selectJawatan.innerHTML = '<option value="">-- Pilih Jawatan --</option>';
+            globalJabatanList.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item; opt.textContent = item;
+                selectJabatan.appendChild(opt);
+            });
+            globalJawatanList.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item; opt.textContent = item;
+                selectJawatan.appendChild(opt);
+            });
+        }
+
+        function renderAdminProgramList() {
+            const tbody = document.getElementById('adminProgramTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            if(globalProgramList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-slate-500">Tiada program direkodkan.</td></tr>';
+                return;
+            }
+            
+            globalProgramList.forEach((prog, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                
+                const tdNama = document.createElement('td');
+                tdNama.className = "px-4 py-3 font-medium text-gov-blue break-words align-top max-w-[150px] md:max-w-xs";
+                tdNama.textContent = prog['Nama Program'];
+                
+                const tdMasa = document.createElement('td');
+                tdMasa.className = "px-4 py-3 align-top break-words";
+                tdMasa.innerHTML = `${prog['Tarikh']}<br><span class="text-xs text-slate-400 font-medium">${prog['Masa Mula']} - ${prog['Masa Akhir']}</span>`;
+                
+                const tdAksi = document.createElement('td');
+                tdAksi.className = "px-4 py-3 text-center align-top shrink-0";
+                
+                const btnEdit = document.createElement('button');
+                btnEdit.type = "button";
+                btnEdit.className = "text-blue-500 hover:text-white bg-blue-50 border border-blue-200 hover:bg-blue-500 p-2 rounded transition-all shadow-sm";
+                btnEdit.title = "Kemaskini";
+                btnEdit.innerHTML = '<i class="fa-solid fa-pen"></i>';
+                btnEdit.onclick = function() {
+                    editProgramClicked(index);
+                };
+                
+                tdAksi.appendChild(btnEdit);
+                tr.appendChild(tdNama);
+                tr.appendChild(tdMasa);
+                tr.appendChild(tdAksi);
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAdminConfigList() {
+            const listJab = document.getElementById('adminJabatanList');
+            const listJaw = document.getElementById('adminJawatanList');
+            if(!listJab || !listJaw) return;
+            
+            listJab.innerHTML = ''; 
+            listJaw.innerHTML = '';
+
+            globalJabatanList.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "px-4 py-3 flex justify-between items-start gap-3 hover:bg-slate-50 border-b last:border-0";
+                
+                const span = document.createElement('span');
+                span.className = "flex-grow break-words text-left mt-1 text-slate-700 leading-tight";
+                span.textContent = item;
+                
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "shrink-0 text-slate-400 hover:text-blue-600 bg-white border border-slate-200 hover:bg-blue-50 hover:border-blue-300 h-8 w-8 rounded flex items-center justify-center transition-all shadow-sm";
+                btn.innerHTML = '<i class="fa-solid fa-pen text-xs"></i>';
+                btn.onclick = function() {
+                    openEditSingleConfig('Jabatan', item);
+                };
+                
+                li.appendChild(span);
+                li.appendChild(btn);
+                listJab.appendChild(li);
+            });
+
+            globalJawatanList.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "px-4 py-3 flex justify-between items-start gap-3 hover:bg-slate-50 border-b last:border-0";
+                
+                const span = document.createElement('span');
+                span.className = "flex-grow break-words text-left mt-1 text-slate-700 leading-tight";
+                span.textContent = item;
+                
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "shrink-0 text-slate-400 hover:text-blue-600 bg-white border border-slate-200 hover:bg-blue-50 hover:border-blue-300 h-8 w-8 rounded flex items-center justify-center transition-all shadow-sm";
+                btn.innerHTML = '<i class="fa-solid fa-pen text-xs"></i>';
+                btn.onclick = function() {
+                    openEditSingleConfig('Jawatan', item);
+                };
+                
+                li.appendChild(span);
+                li.appendChild(btn);
+                listJaw.appendChild(li);
+            });
+        }
+
+        // ==========================================
+        // FUNGSI GLOBAL (ADMIN UI)
+        // ==========================================
+        function openAdminLogin() {
+            const modal = document.getElementById('adminLoginModal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    const passInput = document.getElementById('adminPasswordInput');
+                    if(passInput) passInput.focus();
+                }, 100);
+            }
+        }
+
+        function closeAdminLogin() {
+            const modal = document.getElementById('adminLoginModal');
+            const input = document.getElementById('adminPasswordInput');
+            if(modal) modal.classList.add('hidden');
+            if(input) input.value = "";
+        }
+
+        function checkAdminPassword() {
+            const input = document.getElementById('adminPasswordInput');
+            if(input && input.value === adminPasswordValid && adminPasswordValid !== "") {
+                closeAdminLogin();
+                const panel = document.getElementById('adminPanelModal');
+                if(panel) panel.classList.remove('hidden');
+            } else {
+                showCustomAlert("Ralat Akses", "Kata laluan yang dimasukkan adalah salah atau pangkalan data sedang dimuat turun.");
+            }
+        }
+
+        function closeAdminPanel() {
+            const panel = document.getElementById('adminPanelModal');
+            if(panel) panel.classList.add('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            const btnProg = document.getElementById('tabBtnProg');
+            const btnConfig = document.getElementById('tabBtnConfig');
+            const btnPass = document.getElementById('tabBtnPass');
+            
+            const tabProg = document.getElementById('tabContentProg'); 
+            const tabConfig = document.getElementById('formAdminConfig');
+            const tabPass = document.getElementById('tabContentPass');
+
+            const inactiveClass = "px-4 py-2 text-slate-500 font-medium hover:text-gov-blue transition-colors whitespace-nowrap";
+            const activeClass = "px-4 py-2 text-gov-blue font-bold border-b-2 border-gov-blue transition-colors whitespace-nowrap";
+
+            if(btnProg) btnProg.className = inactiveClass;
+            if(btnConfig) btnConfig.className = inactiveClass;
+            if(btnPass) btnPass.className = inactiveClass;
+
+            if(tabProg) { tabProg.classList.add('hidden'); tabProg.classList.remove('block'); }
+            if(tabConfig) { tabConfig.classList.add('hidden'); tabConfig.classList.remove('flex'); }
+            if(tabPass) { tabPass.classList.add('hidden'); tabPass.classList.remove('block'); }
+
+            if(tab === 'prog') {
+                if(btnProg) btnProg.className = activeClass;
+                if(tabProg) { tabProg.classList.remove('hidden'); tabProg.classList.add('block'); }
+            } else if(tab === 'config') {
+                if(btnConfig) btnConfig.className = activeClass;
+                if(tabConfig) { tabConfig.classList.remove('hidden'); tabConfig.classList.add('flex'); }
+            } else if(tab === 'pass') {
+                if(btnPass) btnPass.className = activeClass;
+                if(tabPass) { tabPass.classList.remove('hidden'); tabPass.classList.add('block'); }
+            }
+        }
+
+        function showCustomAlert(title, text) {
+            const msgTitle = document.getElementById('msgBoxTitle');
+            const msgText = document.getElementById('msgBoxText');
+            const msgBox = document.getElementById('customMessageBox');
+            const msgContent = document.getElementById('msgBoxContent');
+            
+            if(msgTitle) msgTitle.textContent = title;
+            if(msgText) msgText.textContent = text;
+            if(msgBox) msgBox.classList.remove('hidden');
+            if(msgContent) {
+                setTimeout(() => {
+                    msgContent.classList.remove('scale-95');
+                    msgContent.classList.add('scale-100');
+                }, 10);
+            }
+        }
+
+        function closeMessageBox() {
+            const msgContent = document.getElementById('msgBoxContent');
+            const msgBox = document.getElementById('customMessageBox');
+            if(msgContent) {
+                msgContent.classList.remove('scale-100');
+                msgContent.classList.add('scale-95');
+            }
+            if(msgBox) {
+                setTimeout(() => {
+                    msgBox.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        function editProgramClicked(index) {
+            const prog = globalProgramList[index];
+            currentEditProgramOriginalName = prog['Nama Program'];
+            
+            document.getElementById('adminProgNama').value = prog['Nama Program'] || '';
+            document.getElementById('adminProgTarikh').value = parseMalayDateToYMD(prog['Tarikh']) || '';
+            document.getElementById('adminProgHari').value = prog['Hari'] || '';
+            document.getElementById('adminProgMasaMula').value = parseTime(prog['Masa Mula']) || '';
+            document.getElementById('adminProgMasaAkhir').value = parseTime(prog['Masa Akhir']) || '';
+            document.getElementById('adminProgLokasi').value = prog['Lokasi'] || '';
+            document.getElementById('adminProgPenerangan').value = prog['Penerangan'] || '';
+
+            const submitText = document.getElementById('textSubmitProgram');
+            const submitBtn = document.getElementById('btnSubmitProgram');
+            const cancelBtn = document.getElementById('btnCancelEditProgram');
+
+            if(submitText) submitText.textContent = "Kemaskini Program";
+            if(submitBtn) {
+                submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> <span id="textSubmitProgram">Kemaskini Program</span>';
+                submitBtn.classList.replace('bg-gov-blue', 'bg-brand-blue');
+            }
+            if(cancelBtn) cancelBtn.classList.remove('hidden');
+
+            const modal = document.getElementById('adminPanelModal');
+            if(modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditProgram() {
+            currentEditProgramOriginalName = null;
+            const form = document.getElementById('formAdminProg');
+            const submitBtn = document.getElementById('btnSubmitProgram');
+            const cancelBtn = document.getElementById('btnCancelEditProgram');
+
+            if(form) form.reset();
+            if(submitBtn) {
+                submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> <span id="textSubmitProgram">Simpan Program Baharu</span>';
+                submitBtn.classList.replace('bg-brand-blue', 'bg-gov-blue');
+            }
+            if(cancelBtn) cancelBtn.classList.add('hidden');
+        }
+
+        function openEditSingleConfig(type, originalValue) {
+            currentEditSingleConfigType = type;
+            currentEditSingleConfigOriginal = originalValue;
+            
+            const title = document.getElementById('editSingleConfigTitle');
+            const input = document.getElementById('editSingleConfigInput');
+            const modal = document.getElementById('editSingleConfigModal');
+
+            if(title) title.innerHTML = `<i class="fa-solid fa-pen"></i> Edit ${type}`;
+            if(input) input.value = originalValue;
+            if(modal) modal.classList.remove('hidden');
+        }
+
+        function closeEditSingleConfig() {
+            const modal = document.getElementById('editSingleConfigModal');
+            if(modal) modal.classList.add('hidden');
+        }
+
+        function closeModal() {
+            const content = document.getElementById('modalContent');
+            const modal = document.getElementById('successModal');
+            const form = document.getElementById('registrationForm');
+            const card = document.getElementById('programDetailsCard');
+
+            if(content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                if(modal) modal.classList.add('hidden');
+                if(form) form.reset();
+                if(card) card.classList.add('hidden');
+            }, 200);
+        }
+    </script>
+</body>
+</html>

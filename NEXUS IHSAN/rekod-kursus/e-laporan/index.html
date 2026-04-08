@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Program UHEI IKN</title>
+   
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+   
+    <!-- HTML2PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+   
+    <!-- PDF.js Library (For PDF merging) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+   
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+    <!-- PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+   
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* ===== Global Styles ===== */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        /* A4 page wrapper */
+        .a4-page, .page, .sheet, .print-page, #pageOne, #pageTwo, .pdf-attachment-page {
+            width: 100%;
+            max-width: 210mm;
+            min-height: 290mm;       /* full A4 */
+            max-height: 290mm;       /* fixed A4 height */
+            height: auto !important; /* allow content flex */
+            overflow: hidden !important; /* hide overflow */
+            padding: 12mm;           /* standard padding */
+            box-sizing: border-box;
+            background-color: #fffbeb; /* Beige Cream Background */
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            /* Flexbox to push footer down */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Spacing between pages in preview */
+        .a4-page { margin-bottom: 3mm !important; }
+
+        /* ===== Artistic Boxes ===== */
+        .artistic-box {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #0d9488;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .border-rose { border-left-color: #e11d48; }
+        .border-indigo { border-left-color: #4f46e5; }
+        .border-amber { border-left-color: #d97706; }
+        .border-emerald { border-left-color: #059669; }
+
+        /* Info Text */
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            color: #0f172a;
+            font-weight: 500;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        /* Loading & Search Panels */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #searchResultPanel { display: none; }
+
+        /* ===== Admin Table ===== */
+        .admin-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            padding: 0.75rem 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+        .admin-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            color: #334155;
+            vertical-align: middle;
+        }
+        .admin-table tr:hover { background-color: #f1f5f9; }
+
+        /* Scrollbar Styles */
+        .table-container::-webkit-scrollbar { height: 8px; width: 8px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f5f9; }
+
+        /* PDF Attachment Styles */
+        .pdf-canvas-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: hidden;
+        }
+        .pdf-canvas-container canvas {
+            max-width: 100%;
+            max-height: 250mm; /* Leave room for header/footer */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+            <h2 id="loadingText" class="text-lg font-bold text-slate-800">Sedang Memproses...</h2>
+        </div>
+    </div>
+   
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-teal-800 to-indigo-900 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white p-1 rounded-full shadow-md">
+                        <img src="https://i.postimg.cc/1XyKdbY5/image.png" alt="School Logo" class="h-12 w-12 object-contain">
+                    </div>
+                    <div class="text-white hidden md:block">
+                        <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Laporan Program</h1>
+                        <span class="text-xs text-teal-100 font-medium tracking-wider">UHEI Institut Kanser Negara</span>
+                    </div>
+                </div>
+                <div class="flex gap-2 md:gap-3 items-center">
+                     <a href="/rekod-kursus" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-full shadow-md transition-all flex items-center gap-2 text-xs md:text-sm font-bold border border-teal-500 cursor-pointer">
+                        <i class="fas fa-arrow-left"></i> Rekod Program
+                    </a>
+                     <button onclick="openAdminAuth()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-full shadow-md transition-all flex items-center gap-2 text-xs md:text-sm font-bold border border-slate-600">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                     <button onclick="startSearch()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-full shadow-md transition-all flex items-center gap-2 text-xs md:text-sm font-bold border border-amber-400">
+                        <i class="fas fa-search"></i> Carian / Edit
+                    </button>
+                     <button onclick="handleSubmission()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-full shadow-lg shadow-indigo-400/50 transition-all flex items-center gap-2 text-xs md:text-sm font-bold border border-indigo-400">
+                        <i class="fas fa-file-pdf"></i> Simpan & Jana PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 lg:px-8">
+       
+        <!-- SEARCH RESULTS -->
+        <div id="searchResultPanel" class="mb-8 bg-white rounded-2xl shadow-lg border border-slate-200 p-6 animate-fade-in">
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fas fa-list-ul mr-2 text-amber-500"></i>Hasil Carian Laporan</h2>
+                <button onclick="closeSearchPanel()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i> Tutup</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse admin-table">
+                    <thead><tr><th>Tarikh (Timestamp)</th><th>Tajuk</th><th>Status</th><th>Tindakan</th></tr></thead>
+                    <tbody id="searchTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL -->
+        <div id="adminPanel" class="hidden space-y-8 animate-fade-in mb-8">
+            <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div><h2 class="text-2xl font-bold text-slate-800">Dashboard Admin</h2><p class="text-sm text-slate-500">Analisis Data Laporan & Pangkalan Data</p></div>
+                <div id="adminPanelActions" class="flex gap-2">
+                    <button onclick="downloadAdminPDF()" class="text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors border border-indigo-200"><i class="fas fa-download"></i> Simpan PDF</button>
+                    <button onclick="closeAdmin()" class="text-rose-600 hover:bg-rose-50 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors border border-rose-200"><i class="fas fa-times-circle"></i> Tutup</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 flex items-center justify-between">
+                    <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jumlah Hantar</p><h3 id="statTotal" class="text-3xl font-bold text-indigo-700 mt-1">0</h3></div>
+                    <div class="bg-indigo-50 p-3 rounded-full text-indigo-600"><i class="fas fa-file-invoice text-2xl"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
+                    <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Terkini</p><h3 id="statLatest" class="text-sm font-semibold text-emerald-700 mt-1 line-clamp-1">-</h3><p id="statLatestDate" class="text-xs text-slate-400 mt-1">-</p></div>
+                    <div class="bg-emerald-50 p-3 rounded-full text-emerald-600"><i class="fas fa-history text-2xl"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-amber-500 flex items-center justify-between">
+                    <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lokasi Aktif</p><h3 id="statTopPanitia" class="text-sm font-semibold text-amber-700 mt-1">-</h3></div>
+                    <div class="bg-amber-50 p-3 rounded-full text-amber-600"><i class="fas fa-map-marker-alt text-2xl"></i></div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                        <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-chart-bar text-indigo-500"></i> Statistik Mengikut Bulan & Tahun</h3>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select id="chartYearFilter" onchange="filterCharts()" class="text-xs font-semibold text-slate-600 border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 bg-white flex-1 sm:flex-none">
+                                <option value="all">Semua Tahun</option>
+                            </select>
+                            <select id="chartMonthFilter" onchange="filterCharts()" class="text-xs font-semibold text-slate-600 border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 bg-white flex-1 sm:flex-none">
+                                <option value="all">Semua Bulan</option>
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Mac</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Jun</option>
+                                <option value="6">Julai</option>
+                                <option value="7">Ogos</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Disember</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="relative h-64 w-full"><canvas id="chartBulanTahun"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-chart-pie text-teal-500"></i> Statistik Hari</h3>
+                    <div class="relative h-64 w-full flex justify-center"><canvas id="chartHari"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-table mr-2 text-indigo-500"></i>Senarai Laporan Penuh</h3>
+                    <div class="flex gap-2 items-center">
+                        <!-- Filter Dropdown -->
+                        <select id="adminYearFilter" onchange="filterAdminTable()" class="text-xs font-semibold text-slate-600 border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 bg-white">
+                            <option value="all">Semua Tahun</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                        <button onclick="loadDashboardData()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-white px-3 py-1.5 rounded border border-indigo-200 shadow-sm transition-all hover:shadow"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto table-container max-h-[500px]">
+                    <table class="w-full text-left border-collapse admin-table">
+                        <thead class="sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="w-12 text-center">#</th>
+                                <th>Tarikh (Timestamp)</th>
+                                <th>Nama Program / Tajuk</th>
+                                <th>Lokasi / Pegawai</th>
+                                <th class="text-center">PDF</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <tr><td colspan="7" class="text-center py-10 text-slate-400 italic">Memuatkan data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- USER FORM & PREVIEW -->
+        <div id="userPanel" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- INPUT FORM -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative">
+                    <div id="editingBadge" class="hidden absolute top-4 right-4 bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded border border-amber-200">MODE EDIT</div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg"><i class="fas fa-edit"></i></span> Maklumat Program</h2>
+                    
+                    <form id="plcForm" class="space-y-4">
+                        <input type="hidden" id="rowIndex" value="">
+                        <input type="hidden" id="existingPdfLink" value="">
+                        
+                        <!-- Program Selection Area -->
+                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Pilih Program / Laporan</label>
+                            <select id="inputTajuk" onchange="handleProgramSelection()" class="w-full rounded-lg border-slate-300 bg-white focus:border-indigo-500 p-2.5 text-sm font-semibold mb-4 outline-none">
+                                <option value="">Senarai sedang dimuatkan...</option>
+                            </select>
+
+                            <div id="programDetails" class="hidden space-y-3 bg-white p-3 rounded border border-slate-200 text-xs">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><span class="text-slate-400 block mb-0.5 font-semibold">Tarikh</span><strong id="displayTarikh" class="text-slate-700"></strong></div>
+                                    <div><span class="text-slate-400 block mb-0.5 font-semibold">Hari</span><strong id="displayHari" class="text-slate-700"></strong></div>
+                                    <div><span class="text-slate-400 block mb-0.5 font-semibold">Masa</span><strong id="displayMasa" class="text-slate-700"></strong></div>
+                                    <div><span class="text-slate-400 block mb-0.5 font-semibold">Lokasi</span><strong id="displayLokasi" class="text-slate-700"></strong></div>
+                                </div>
+                                <div class="mt-2 pt-2 border-t border-slate-100">
+                                    <span class="text-slate-400 block mb-0.5 font-semibold">Penerangan</span>
+                                    <p id="displayPenerangan" class="text-slate-700 font-medium"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Manual Inputs (User action required) -->
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 text-rose-600">Fokus</label><input type="text" id="inputFocus" oninput="updatePreview()" class="w-full rounded-lg border-rose-100 bg-rose-50 p-2.5 border text-sm" placeholder="Contoh: Taklimat / Latihan Praktikal"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 text-emerald-600">Penambahbaikan</label><input type="text" id="inputImprove" oninput="updatePreview()" class="w-full rounded-lg border-emerald-100 bg-emerald-50 p-2.5 border text-sm" placeholder="Contoh: Perlu lebih masa latihan"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 text-amber-600">Perkongsian</label><textarea id="inputShare" oninput="updatePreview()" rows="2" class="w-full rounded-lg border-amber-100 bg-amber-50 p-2.5 border text-sm" placeholder="Contoh: Slaid dikongsi dalam grup Whatsapp"></textarea></div>
+                       
+                        <!-- Senarai Peserta -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 text-indigo-600">Senarai Kehadiran / Kakitangan</label>
+                            <textarea id="inputPeserta" oninput="updatePreview()" rows="5" class="w-full rounded-lg border-indigo-100 bg-indigo-50 p-2.5 border text-sm placeholder-slate-400" placeholder="Masukkan nama (Satu nama sebaris)&#10;Contoh:&#10;1. Dr. Ahmad&#10;2. SN Siti"></textarea>
+                            <p class="text-[10px] text-slate-400 mt-1 italic text-right">Maksimum 20 nama disarankan.</p>
+                        </div>
+
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Disediakan Oleh <span class="text-red-500">*</span></label><input type="text" id="inputNama" oninput="updatePreview()" class="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 border text-sm" placeholder="Nama Pegawai / Penyelaras"></div>
+                    </form>
+                    <button onclick="resetForm()" class="mt-4 w-full text-slate-400 text-xs hover:text-slate-600 underline">Reset Borang</button>
+                </div>
+
+                <!-- UPLOAD SECTION (IMAGE & PDF) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="bg-rose-100 text-rose-600 p-2 rounded-lg"><i class="fas fa-paperclip"></i></span> Lampiran / Bukti</h2>
+                   
+                    <!-- Image Upload -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">1. Gambar Aktiviti</label>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
+                            <input type="file" id="imgUpload" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 mb-3">
+                            <input type="text" id="imgDesc" placeholder="Keterangan gambar..." class="w-full rounded-lg border-slate-200 shadow-sm p-2 border text-xs mb-3">
+                            <button onclick="addImage()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2 px-4 rounded-lg text-xs font-bold transition-colors uppercase tracking-wider"><i class="fas fa-plus mr-1"></i> Tambah Gambar</button>
+                        </div>
+                        <div class="mt-2 space-y-2" id="imageListControl"><p class="text-xs text-slate-400 italic text-center">Belum ada gambar.</p></div>
+                    </div>
+
+                    <!-- PDF Upload -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">2. Fail PDF (Kehadiran/Bahan)</label>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
+                            <p class="text-[10px] text-slate-500 mb-2 italic">* PDF akan digabungkan secara automatik sebagai muka surat seterusnya.</p>
+                            <input type="file" id="pdfUpload" accept="application/pdf" onchange="handlePdfUpload(this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        </div>
+                        <div id="pdfUploadStatus" class="mt-2 text-xs text-center text-slate-500 italic">Tiada PDF dipilih</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIEW AREA -->
+            <div class="lg:col-span-8 flex justify-center bg-slate-200 p-4 lg:p-8 rounded-3xl overflow-x-auto shadow-inner">
+                <div id="pdfContent">
+                   
+                    <!-- PAGE 1: MAKLUMAT -->
+                    <div class="a4-page">
+                       
+                        <!-- Header & Title -->
+                        <div class="flex items-center justify-between border-b-2 border-indigo-900 pb-3 mb-4">
+                            <div class="flex items-center gap-4">
+                                <img src="https://i.postimg.cc/1XyKdbY5/image.png" alt="Logo" class="h-24 w-auto drop-shadow-sm">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-slate-900 leading-none mb-1">Laporan Program UHEI IKN</h1>
+                                    <p class="text-slate-600 font-semibold text-sm tracking-widest mt-1">UHEI Institut Kanser Negara</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Body -->
+                        <div class="flex-grow flex flex-col gap-3">
+                            <!-- Tajuk -->
+                            <div class="artistic-box border-l-8 !border-indigo-800 bg-white">
+                                <div class="info-label text-indigo-800">Nama Program</div>
+                                <div id="prevTajuk" class="info-value text-lg font-bold text-slate-800">Sila pilih program...</div>
+                            </div>
+
+                            <!-- Lokasi & Hari -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="artistic-box">
+                                    <div class="info-label text-teal-700">Lokasi</div>
+                                    <div id="prevLokasi" class="info-value">...</div>
+                                </div>
+                                <div class="artistic-box">
+                                    <div class="info-label text-teal-700">Hari</div>
+                                    <div id="prevHari" class="info-value">...</div>
+                                </div>
+                            </div>
+
+                            <!-- Dates & Masa -->
+                            <div class="artistic-box border-slate-500 bg-white shadow-sm">
+                                <div class="info-label mb-2 text-slate-800 border-b border-slate-200 pb-1">Butiran Pelaksanaan</div>
+                                <div class="grid grid-cols-2 gap-y-3 gap-x-4">
+                                    <div><span class="text-[10px] text-slate-500 uppercase block font-bold">Tarikh</span><span id="prevTarikh" class="text-sm font-bold text-slate-800">-</span></div>
+                                    <div><span class="text-[10px] text-slate-500 uppercase block font-bold">Masa</span><span id="prevMasa" class="text-sm font-bold text-slate-800">-</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Texts -->
+                            <div class="artistic-box"><div class="info-label text-teal-700">Penerangan</div><div id="prevPenerangan" class="info-value text-justify">...</div></div>
+                            <div class="artistic-box border-rose"><div class="info-label text-rose-700">Fokus</div><div id="prevFocus" class="info-value">...</div></div>
+                            <div class="artistic-box border-emerald"><div class="info-label text-emerald-700">Penambahbaikan</div><div id="prevImprove" class="info-value">...</div></div>
+                            <div class="artistic-box border-amber"><div class="info-label text-amber-700">Perkongsian</div><div id="prevShare" class="info-value">...</div></div>
+                           
+                            <!-- Senarai Peserta Preview -->
+                            <div id="pesertaSection" class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 shadow-sm hidden">
+                                <h3 class="text-indigo-800 font-bold text-[10px] uppercase mb-1 border-b border-indigo-200 pb-1">
+                                    <i class="fas fa-users mr-1"></i>Senarai Kehadiran / Kakitangan
+                                </h3>
+                                <div id="prevPeserta" class="text-[10px] text-slate-700 font-medium grid grid-cols-2 gap-x-2 gap-y-0.5 leading-tight">
+                                    <!-- Names injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Page 1 -->
+                        <div class="mt-4 pt-3 border-t-2 border-slate-300 flex justify-end">
+                            <p class="text-[10px] text-slate-500 font-medium">© 2026 All Right Reserved by UHEI Institut Kanser Negara</p>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 2: GAMBAR -->
+                    <div class="a4-page page-break" id="pageTwo">
+                         <div class="flex items-center justify-between border-b-2 border-rose-500 pb-4 mb-6">
+                            <div>
+                                <h1 class="text-3xl font-bold text-slate-900 uppercase">Gambar Aktiviti</h1>
+                                <p class="text-rose-600 font-bold text-sm">Dokumentasi Bergambar</p>
+                            </div>
+                            <img src="https://i.postimg.cc/1XyKdbY5/image.png" alt="Logo" class="h-16 w-auto opacity-90">
+                        </div>
+                        <div class="flex-grow">
+                            <div id="evidenceGrid" class="grid grid-cols-2 gap-6">
+                                <div class="col-span-2 text-center py-20 text-slate-400 border-2 border-dashed border-slate-300 rounded-xl bg-white/50"><i class="fas fa-image text-4xl mb-2 text-slate-300"></i><p class="font-medium">Gambar aktiviti akan muncul di sini</p></div>
+                            </div>
+                        </div>
+                       
+                        <!-- Footer Page 2 -->
+                        <div class="mt-8 pt-4 border-t-2 border-slate-300 flex justify-between items-end">
+                            <div>
+                                <p class="text-[10px] text-slate-500 mb-1 uppercase tracking-wide font-bold">Disediakan Oleh:</p>
+                                <p id="prevNama" class="text-sm font-bold text-slate-900 uppercase">...</p>
+                            </div>
+                            <p class="text-[10px] text-slate-500 font-medium">© 2026 All Right Reserved by UHEI Institut Kanser Negara</p>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 3+: PDF ATTACHMENTS CONTAINER -->
+                    <div id="pdfAttachmentContainer">
+                        <!-- PDF pages will be rendered here dynamically -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- CONSTANTS ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsO7SW0OIwkvCpbuH-JLpZn1UYiQo7ZY9r9X5LMpSDD7ZUcOgButFgZG5E2NX0Ijo/exec";
+        // Admin CSV (Submissions)
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRT2HvCVYC1WY0u2jrTErr_17pFRjaBHh6OSx_sfZsHwUJTaPOW9sTJHF91lI4PlgAQxCSdTVh8omVP/pub?output=csv";
+        
+        // Program List CSV (Dropdown)
+        const PROGRAM_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=553481558&single=true&output=csv";
+
+        // Setup PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        let evidenceImages = [];
+        let chartInstanceBulanTahun = null;
+        let chartInstanceHari = null;
+        let allAdminReports = []; // Store all reports for filtering
+        let programList = []; // Store fetched program list
+
+        // --- NETWORK UTILITY ---
+        async function fetchWithRetry(url, options, maxRetries = 3) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response;
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                }
+            }
+        }
+
+        // --- DATE FORMATTER ---
+        function formatDateOnly(val) {
+            if(!val) return '-';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+                const parts = val.split('-');
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            const d = new Date(val);
+            if(isNaN(d.getTime())) return val;
+            return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kuala_Lumpur' }).format(d);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            loadProgramDropdown();
+        };
+
+        function loadProgramDropdown() {
+            Papa.parse(PROGRAM_LIST_CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    programList = results.data.filter(row => row['Nama Program']);
+                    populateProgramDropdown();
+                },
+                error: function(err) {
+                    console.error("Error fetching program list:", err);
+                    document.getElementById('inputTajuk').innerHTML = '<option value="">Gagal memuat turun data.</option>';
+                }
+            });
+        }
+
+        function populateProgramDropdown() {
+            const select = document.getElementById('inputTajuk');
+            select.innerHTML = '<option value="">-- Sila Pilih Program --</option>';
+            programList.forEach((prog, index) => {
+                select.innerHTML += `<option value="${index}">${prog['Nama Program']}</option>`;
+            });
+        }
+
+        function handleProgramSelection() {
+            const select = document.getElementById('inputTajuk');
+            const detailsDiv = document.getElementById('programDetails');
+            const index = select.value;
+
+            if (index === "" || index === "custom") {
+                detailsDiv.classList.add('hidden');
+                updatePreview();
+                return;
+            }
+
+            const prog = programList[index];
+            document.getElementById('displayTarikh').innerText = prog['Tarikh'] || '-';
+            document.getElementById('displayHari').innerText = prog['Hari'] || '-';
+            document.getElementById('displayMasa').innerText = (prog['Masa Mula'] || '-') + ' - ' + (prog['Masa Akhir'] || '-');
+            document.getElementById('displayLokasi').innerText = prog['Lokasi'] || '-';
+            document.getElementById('displayPenerangan').innerText = prog['Penerangan'] || 'Tiada penerangan disediakan.';
+
+            detailsDiv.classList.remove('hidden');
+            updatePreview();
+        }
+
+        // --- PREVIEW LOGIC ---
+        function updatePreview() {
+            const index = document.getElementById('inputTajuk').value;
+            let prog = null;
+            if (index !== "" && index !== "custom") {
+                prog = programList[index];
+            } else if (index === "custom") {
+                // If it's a loaded old report not in list
+                prog = programList[programList.length - 1]; // temp appended item
+            }
+
+            // Maps to preview elements
+            document.getElementById('prevTajuk').innerText = prog ? prog['Nama Program'] : 'Sila pilih program...';
+            document.getElementById('prevLokasi').innerText = prog ? (prog['Lokasi'] || '-') : '...';
+            document.getElementById('prevHari').innerText = prog ? (prog['Hari'] || '-') : '...';
+            document.getElementById('prevTarikh').innerText = prog ? (prog['Tarikh'] || '-') : '-';
+            document.getElementById('prevMasa').innerText = prog ? `${prog['Masa Mula'] || '-'} - ${prog['Masa Akhir'] || '-'}` : '-';
+            document.getElementById('prevPenerangan').innerText = prog ? (prog['Penerangan'] || '-') : '...';
+
+            document.getElementById('prevFocus').innerText = document.getElementById('inputFocus').value || '...';
+            document.getElementById('prevImprove').innerText = document.getElementById('inputImprove').value || '...';
+            document.getElementById('prevShare').innerText = document.getElementById('inputShare').value || '...';
+            document.getElementById('prevNama').innerText = document.getElementById('inputNama').value || '(Nama Pegawai)';
+           
+            // Preview Senarai Peserta
+            const pesertaText = document.getElementById('inputPeserta').value;
+            const pesertaDiv = document.getElementById('prevPeserta');
+            const pesertaSection = document.getElementById('pesertaSection');
+           
+            if (pesertaText.trim()) {
+                pesertaSection.classList.remove('hidden');
+                const names = pesertaText.split('\n').filter(n => n.trim() !== '');
+                pesertaDiv.innerHTML = names.map(n => `<div>• ${n}</div>`).join('');
+            } else {
+                pesertaSection.classList.add('hidden');
+                pesertaDiv.innerHTML = '';
+            }
+        }
+
+        // --- IMAGE HANDLING ---
+        function addImage() {
+            const fileInput = document.getElementById('imgUpload');
+            const descInput = document.getElementById('imgDesc');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    evidenceImages.push({ src: e.target.result, desc: descInput.value || "" });
+                    fileInput.value = ''; descInput.value = '';
+                    renderImages(); renderImageListControl();
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            } else { Swal.fire('Oops...', 'Sila pilih gambar dahulu.', 'warning'); }
+        }
+
+        function renderImages() {
+            const grid = document.getElementById('evidenceGrid');
+            grid.innerHTML = '';
+
+            if (evidenceImages.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 text-center py-20 text-slate-400 border-2 border-dashed border-slate-300 rounded-xl bg-white/50">
+                        <i class="fas fa-image text-4xl mb-2 text-slate-300"></i>
+                        <p class="font-medium">Gambar aktiviti akan muncul di sini</p>
+                    </div>`;
+                return;
+            }
+
+            evidenceImages.forEach(img => {
+                const div = document.createElement('div');
+                div.className = "flex flex-col gap-3 break-inside-avoid bg-white p-3 rounded-xl shadow-md border border-slate-200";
+                div.innerHTML = `
+                    <div class="w-full max-h-[350px] overflow-hidden rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
+                        <img src="${img.src}" class="max-w-full h-auto object-contain mx-auto" style="max-height: 350px;">
+                    </div>
+                    ${img.desc ? `<p class="text-sm leading-snug text-slate-800 font-semibold text-center mt-1 px-2 py-1 bg-amber-50 rounded border border-amber-100">${img.desc}</p>` : ''}
+                `;
+                grid.appendChild(div);
+            });
+        }
+        function renderImageListControl() {
+            const list = document.getElementById('imageListControl');
+            list.innerHTML = '';
+            evidenceImages.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200";
+                item.innerHTML = `<div class="flex items-center gap-2 overflow-hidden"><img src="${img.src}" class="w-8 h-8 object-cover rounded"><span class="text-xs text-slate-600 truncate max-w-[150px]">${img.desc || 'Tiada info'}</span></div><button onclick="removeImage(${index})" class="text-rose-500 hover:text-rose-700 px-2"><i class="fas fa-times"></i></button>`;
+                list.appendChild(item);
+            });
+        }
+
+        function removeImage(index) {
+            evidenceImages.splice(index, 1);
+            renderImages();
+            renderImageListControl();
+        }
+
+        // --- PDF ATTACHMENT HANDLING ---
+        async function handlePdfUpload(input) {
+            const file = input.files[0];
+            const statusDiv = document.getElementById('pdfUploadStatus');
+            const container = document.getElementById('pdfAttachmentContainer');
+            container.innerHTML = '';
+
+            if (!file) {
+                statusDiv.innerText = "Tiada PDF dipilih";
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                Swal.fire('Ralat', 'Sila muat naik fail PDF sahaja.', 'error');
+                input.value = '';
+                return;
+            }
+
+            statusDiv.innerHTML = '<span class="text-indigo-600 animate-pulse"><i class="fas fa-spinner fa-spin"></i> Memproses halaman PDF...</span>';
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                const totalPages = pdf.numPages;
+
+                statusDiv.innerText = `${file.name} (${totalPages} muka surat)`;
+
+                if(totalPages > 10) {
+                     Swal.fire('Perhatian', 'PDF ini mempunyai banyak muka surat. Proses mungkin sedikit perlahan.', 'warning');
+                }
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const scale = 2; 
+                    const viewport = page.getViewport({ scale: scale });
+
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'a4-page pdf-attachment-page page-break';
+                   
+                    pageDiv.innerHTML = `
+                        <div class="flex items-center justify-between border-b-2 border-slate-300 pb-2 mb-4">
+                            <div>
+                                <h1 class="text-lg font-bold text-slate-700 uppercase">Lampiran PDF</h1>
+                                <p class="text-slate-500 text-xs">Muka Surat ${i} dari ${totalPages}</p>
+                            </div>
+                             <p class="text-[10px] text-slate-400">Lampiran Tambahan</p>
+                        </div>
+                        <div class="pdf-canvas-container flex-grow">
+                            <canvas id="pdf-render-${i}"></canvas>
+                        </div>
+                         <div class="mt-4 pt-2 border-t border-slate-200 flex justify-end">
+                            <p class="text-[10px] text-slate-400 font-medium">Dokumen Sokongan Laporan Program</p>
+                        </div>
+                    `;
+
+                    container.appendChild(pageDiv);
+
+                    const canvas = pageDiv.querySelector(`canvas`);
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    await page.render(renderContext).promise;
+                }
+
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                console.error("PDF Render Error:", error);
+                statusDiv.innerText = "Gagal memproses PDF.";
+                Swal.fire('Ralat', 'Gagal memproses fail PDF. Pastikan fail tidak rosak.', 'error');
+            }
+        }
+
+        // --- ADMIN DASHBOARD ---
+        function loadDashboardData() {
+            document.getElementById('adminTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-10"><div class="flex justify-center items-center gap-3"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div><span class="text-slate-500 italic">Sedang menyegerakkan data terkini...</span></div></td></tr>';
+
+            Papa.parse(GOOGLE_SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) processDashboardData(results.data);
+                    else document.getElementById('adminTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-4 text-slate-400">Tiada data dijumpai.</td></tr>';
+                },
+                error: function(err) {
+                    console.error("CSV Parse Error:", err);
+                    Swal.fire('Ralat', 'Gagal membaca data.', 'error');
+                }
+            });
+        }
+
+        function processDashboardData(data) {
+            // Mesti wujud data timestamp & tajuk report
+            const validData = data.filter(row => row['Timestamp'] && row['Tajuk Report']);
+            allAdminReports = validData;
+
+            setupYearFilter(validData);
+            filterAdminTable();
+
+            document.getElementById('statTotal').innerText = validData.length;
+            if (validData.length > 0) {
+                const latest = validData[validData.length - 1];
+                document.getElementById('statLatest').innerText = latest['Tajuk Report'] || '-';
+                document.getElementById('statLatestDate').innerText = formatDateOnly(latest['Timestamp']);
+            }
+
+            const lokasiCounts = {}; // Cuma untuk mencari top Lokasi
+
+            validData.forEach(row => {
+                // Untuk Lokasi Aktif Top Card
+                const l = row['Lokasi'] ? row['Lokasi'].trim() : 'Lain-lain';
+                lokasiCounts[l] = (lokasiCounts[l] || 0) + 1;
+            });
+
+            // Set Lokasi Paling Aktif
+            let topLokasi = '-', maxCount = 0;
+            for (const [key, value] of Object.entries(lokasiCounts)) {
+                if (value > maxCount && key !== '-') { maxCount = value; topLokasi = key; }
+            }
+            document.getElementById('statTopPanitia').innerText = topLokasi;
+            
+            filterCharts();
+        }
+
+        function setupYearFilter(data) {
+            const yearSet = new Set();
+            data.forEach(row => {
+                let dateStr = row['Tarikh Laporan'] || row['Timestamp'];
+                if(dateStr) {
+                    const d = new Date(dateStr);
+                    if(!isNaN(d.getTime())) yearSet.add(d.getFullYear());
+                }
+            });
+
+            const sortedYears = Array.from(yearSet).sort().reverse();
+            
+            // Filter untuk Data Table
+            const select = document.getElementById('adminYearFilter');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="all">Semua Tahun</option>';
+
+            // Filter untuk Carta (Charts)
+            const chartSelect = document.getElementById('chartYearFilter');
+            const currentChartVal = chartSelect ? chartSelect.value : null;
+            if (chartSelect) chartSelect.innerHTML = '<option value="all">Semua Tahun</option>';
+
+            sortedYears.forEach(year => {
+                select.innerHTML += `<option value="${year}">${year}</option>`;
+                if (chartSelect) chartSelect.innerHTML += `<option value="${year}">${year}</option>`;
+            });
+            
+            select.value = currentVal;
+            if(chartSelect && currentChartVal) chartSelect.value = currentChartVal;
+        }
+
+        function filterCharts() {
+            const selectedYear = document.getElementById('chartYearFilter').value;
+            const selectedMonth = document.getElementById('chartMonthFilter').value;
+
+            let filteredData = allAdminReports;
+
+            if (selectedYear !== 'all') {
+                filteredData = filteredData.filter(row => {
+                    let dateStr = row['Tarikh Laporan'] || row['Timestamp'];
+                    if(!dateStr) return false;
+                    const d = new Date(dateStr);
+                    return !isNaN(d.getTime()) && d.getFullYear().toString() === selectedYear;
+                });
+            }
+
+            if (selectedMonth !== 'all') {
+                filteredData = filteredData.filter(row => {
+                    let dateStr = row['Tarikh Laporan'] || row['Timestamp'];
+                    if(!dateStr) return false;
+                    const d = new Date(dateStr);
+                    return !isNaN(d.getTime()) && d.getMonth().toString() === selectedMonth;
+                });
+            }
+
+            const bulanTahunCounts = {};
+            const hariCounts = {};
+
+            filteredData.forEach(row => {
+                // Ekstrak Bulan & Tahun untuk Carta Bar
+                let dateStr = row['Tarikh Laporan'] || row['Timestamp'];
+                if(dateStr) {
+                    const d = new Date(dateStr);
+                    if(!isNaN(d.getTime())) {
+                        const monthYear = d.toLocaleString('ms-MY', { month: 'short', year: 'numeric' });
+                        bulanTahunCounts[monthYear] = (bulanTahunCounts[monthYear] || 0) + 1;
+                    }
+                }
+
+                // Ekstrak Hari untuk Carta Doughnut
+                const h = row['Hari'] ? row['Hari'].trim() : 'Lain-lain';
+                if(h !== '-') {
+                    hariCounts[h] = (hariCounts[h] || 0) + 1;
+                }
+            });
+
+            renderAdminCharts(bulanTahunCounts, hariCounts);
+        }
+
+        function filterAdminTable() {
+            const selectedYear = document.getElementById('adminYearFilter').value;
+            let filteredData = allAdminReports;
+
+            if (selectedYear !== 'all') {
+                filteredData = allAdminReports.filter(row => {
+                    let dateStr = row['Tarikh Laporan'] || row['Timestamp'];
+                    if(!dateStr) return false;
+                    const d = new Date(dateStr);
+                    return !isNaN(d.getTime()) && d.getFullYear().toString() === selectedYear;
+                });
+            }
+            renderAdminTable(filteredData);
+        }
+
+        function renderAdminTable(data) {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+
+            if(data.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-slate-400">Tiada data bagi tahun ini.</td></tr>';
+                 return;
+            }
+
+            [...data].reverse().forEach((row, index) => {
+                const tr = document.createElement('tr');
+                const originalIndex = allAdminReports.indexOf(row);
+                const sheetRowIndex = originalIndex + 2;
+
+                tr.id = `row-${sheetRowIndex}`;
+
+                let dateStr = formatDateOnly(row['Timestamp']);
+                let linkRaw = row['Pautan PDF'] || '';
+                let linkHtml = '<span class="text-slate-300 text-xs">-</span>';
+                if (linkRaw && linkRaw.startsWith('http')) {
+                    linkHtml = `<a href="${linkRaw}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100" title="Lihat PDF"><i class="fas fa-file-pdf"></i></a>`;
+                }
+
+                let statusRaw = row['Status'] || 'SIMPAN';
+                if(statusRaw.toUpperCase().includes('TELAH DISEMAK')) statusRaw = 'TELAH DISEMAK';
+                else if(statusRaw.toUpperCase().includes('HANTAR')) statusRaw = 'HANTAR';
+                else statusRaw = 'SIMPAN';
+
+                let statusBadge = '';
+                if(statusRaw === 'TELAH DISEMAK') statusBadge = '<span class="bg-teal-100 text-teal-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wide border border-teal-200">DISEMAK</span>';
+                else if(statusRaw === 'HANTAR') statusBadge = '<span class="bg-indigo-100 text-indigo-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wide border border-indigo-200">HANTAR</span>';
+                else statusBadge = '<span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wide border border-slate-200">DRAFT</span>';
+
+                let actionHtml = '';
+                if(statusRaw !== 'TELAH DISEMAK') {
+                    actionHtml = `<button onclick="markReportChecked(${sheetRowIndex}, this)" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded shadow-sm font-medium transition-colors flex items-center gap-1"><i class="fas fa-check"></i> Semak</button>`;
+                } else {
+                    actionHtml = `<span class="text-emerald-600 text-xs font-bold"><i class="fas fa-check-circle"></i> Selesai</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="text-center font-mono text-xs text-slate-400">${data.length - index}</td>
+                    <td class="font-medium text-slate-600">${dateStr}</td>
+                    <td class="font-bold text-slate-700 line-clamp-1">${row['Tajuk Report'] || '-'}</td>
+                    <td class="text-sm text-slate-600">
+                        <div class="font-semibold text-indigo-600">${row['Lokasi'] || '-'}</div>
+                        <div class="text-xs text-slate-400">${row['Disediakan Oleh'] || ''}</div>
+                    </td>
+                    <td class="text-center">${linkHtml}</td>
+                    <td class="text-center" id="status-cell-${sheetRowIndex}">${statusBadge}</td>
+                    <td class="text-center" id="action-cell-${sheetRowIndex}">${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function markReportChecked(rowIndex, btnElement) {
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btnElement.disabled = true;
+
+            try {
+                const payload = { action: 'MARK_CHECKED', rowIndex: rowIndex };
+                await fetchWithRetry(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(payload)
+                });
+
+                const statusCell = document.getElementById(`status-cell-${rowIndex}`);
+                const actionCell = document.getElementById(`action-cell-${rowIndex}`);
+               
+                if(statusCell) statusCell.innerHTML = '<span class="bg-teal-100 text-teal-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wide border border-teal-200 animate-pulse">DISEMAK</span>';
+                if(actionCell) actionCell.innerHTML = `<span class="text-emerald-600 text-xs font-bold animate-fade-in"><i class="fas fa-check-circle"></i> Selesai</span>`;
+
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                Toast.fire({ icon: 'success', title: 'Status berjaya dikemaskini!' });
+               
+                const rowInArray = allAdminReports[rowIndex - 2];
+                if(rowInArray) rowInArray['Status'] = 'TELAH DISEMAK';
+
+            } catch (error) {
+                console.error(error);
+                btnElement.innerHTML = originalText;
+                btnElement.disabled = false;
+                Swal.fire('Ralat', 'Gagal mengemaskini status.', 'error');
+            }
+        }
+
+        function renderAdminCharts(bulanTahunData, hariData) {
+            const ctxP = document.getElementById('chartBulanTahun').getContext('2d');
+            if (chartInstanceBulanTahun) chartInstanceBulanTahun.destroy();
+            chartInstanceBulanTahun = new Chart(ctxP, { type: 'bar', data: { labels: Object.keys(bulanTahunData), datasets: [{ label: 'Laporan', data: Object.values(bulanTahunData), backgroundColor: '#6366f1', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } } } });
+
+            const ctxA = document.getElementById('chartHari').getContext('2d');
+            if (chartInstanceHari) chartInstanceHari.destroy();
+            const colors = ['#0d9488', '#e11d48', '#d97706', '#4f46e5', '#059669', '#2563eb', '#db2777'];
+            chartInstanceHari = new Chart(ctxA, { type: 'doughnut', data: { labels: Object.keys(hariData), datasets: [{ data: Object.values(hariData), backgroundColor: colors.slice(0, Object.keys(hariData).length), borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10 } } }, cutout: '70%' } });
+        }
+
+        // --- DOWNLOAD DASHBOARD ADMIN ---
+        function downloadAdminPDF() {
+            const adminPanel = document.getElementById('adminPanel');
+            const actionButtons = document.getElementById('adminPanelActions');
+            
+            // Sembunyikan butang sebentar agar tidak masuk dalam cetakan PDF
+            actionButtons.style.display = 'none';
+
+            const opt = {
+                margin:       10,
+                filename:     'Dashboard_Admin_IKN.pdf',
+                image:        { type: 'jpeg', quality: 1.0 }, // Kualiti imej maksimum (1.0)
+                html2canvas:  { 
+                    scale: 4, // Dinaikkan dari 2 ke 4 untuk resolusi lebih tajam (High Res)
+                    useCORS: true,
+                    letterRendering: true,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(adminPanel).save().then(() => {
+                // Munculkan kembali butang
+                actionButtons.style.display = 'flex';
+            });
+        }
+
+        // --- SEARCH LOGIC ---
+        async function startSearch() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').innerText = "Memuatkan senarai laporan...";
+            try {
+                const response = await fetchWithRetry(SCRIPT_URL, { 
+                    method: 'POST', 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    // Menggunakan Action baharu: GET_ALL_REPORTS
+                    body: JSON.stringify({ action: 'GET_ALL_REPORTS' }) 
+                });
+                const result = await response.json();
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('loadingText').innerText = "Sedang Memproses..."; // Reset text
+                
+                if (result.data && result.data.length > 0) {
+                    displaySearchResults(result.data);
+                } else {
+                    Swal.fire('Tiada Rekod', 'Tiada laporan dijumpai di dalam pangkalan data.', 'info');
+                }
+            } catch (error) {
+                console.error(error); 
+                document.getElementById('loadingOverlay').style.display = 'none'; 
+                document.getElementById('loadingText').innerText = "Sedang Memproses...";
+                Swal.fire('Ralat', 'Gagal menyambung ke database.', 'error');
+            }
+        }
+       
+        function displaySearchResults(reports) {
+            const panel = document.getElementById('searchResultPanel');
+            const tbody = document.getElementById('searchTableBody');
+            tbody.innerHTML = '';
+            reports.forEach(report => {
+                const dateStr = formatDateOnly(report.timestamp);
+                const statusBadge = report.status === 'HANTAR' ? '<span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded font-bold">HANTAR</span>' : (report.status === 'TELAH DISEMAK' ? '<span class="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded font-bold">DISEMAK</span>' : '<span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-bold">DRAFT</span>');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${dateStr}</td><td class="font-medium">${report.tajuk}</td><td>${statusBadge}</td><td><div class="flex gap-2"><button onclick='loadReportForEdit(${JSON.stringify(report)})' class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"><i class="fas fa-edit"></i></button><button onclick="deleteReport('${report.rowIndex}')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button></div></td>`;
+                tbody.appendChild(tr);
+            });
+            panel.style.display = 'block'; panel.scrollIntoView({ behavior: 'smooth' });
+        }
+       
+        function closeSearchPanel() { document.getElementById('searchResultPanel').style.display = 'none'; }
+       
+        function loadReportForEdit(report) {
+            document.getElementById('rowIndex').value = report.rowIndex;
+            document.getElementById('existingPdfLink').value = report.pdfLink || "";
+            
+            let foundIndex = programList.findIndex(p => p['Nama Program'] === report.tajuk);
+            const select = document.getElementById('inputTajuk');
+            
+            if(foundIndex !== -1) {
+                select.value = foundIndex;
+            } else {
+                programList.push({
+                    'Nama Program': report.tajuk,
+                    'Tarikh': report.tarikhLaksana,
+                    'Hari': report.hari,      
+                    'Lokasi': report.lokasi, 
+                    'Masa Mula': report.masa ? report.masa.split(' - ')[0] : '',
+                    'Masa Akhir': report.masa ? report.masa.split(' - ')[1] : '',
+                    'Penerangan': report.penerangan 
+                });
+                foundIndex = programList.length - 1;
+                select.innerHTML += `<option value="custom">Rekod Lama: ${report.tajuk}</option>`;
+                select.value = "custom";
+            }
+
+            handleProgramSelection();
+
+            // Set the rest of user manually populated fields
+            document.getElementById('inputFocus').value = report.focus; 
+            document.getElementById('inputImprove').value = report.improve; 
+            document.getElementById('inputShare').value = report.share; 
+            document.getElementById('inputNama').value = report.nama;
+            document.getElementById('inputPeserta').value = report.senaraiPeserta || "";
+
+            document.getElementById('editingBadge').classList.remove('hidden'); evidenceImages = []; renderImages();
+            document.getElementById('pdfAttachmentContainer').innerHTML = '';
+            document.getElementById('pdfUpload').value = '';
+            document.getElementById('pdfUploadStatus').innerText = 'Tiada PDF dipilih';
+
+            Swal.fire({ title: 'Mode Edit', text: 'Data dimuatkan. Sila muat naik semula PDF jika perlu diganti.', icon: 'info', timer: 3000 });
+            updatePreview(); closeSearchPanel(); document.getElementById('userPanel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function deleteReport(rowIndex) {
+            const confirm = await Swal.fire({ title: 'Anda pasti?', text: "Padam laporan?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' });
+            if (confirm.isConfirmed) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                try { await fetchWithRetry(SCRIPT_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'DELETE', rowIndex: rowIndex }) }); document.getElementById('loadingOverlay').style.display = 'none'; Swal.fire('Berjaya', 'Dipadam.', 'success'); closeSearchPanel(); } catch (e) { Swal.fire('Ralat', 'Gagal memadam.', 'error'); }
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('plcForm').reset();
+            document.getElementById('inputTajuk').value = "";
+            document.getElementById('rowIndex').value = "";
+            document.getElementById('existingPdfLink').value = "";
+            document.getElementById('editingBadge').classList.add('hidden');
+            
+            document.getElementById('programDetails').classList.add('hidden');
+            
+            evidenceImages = [];
+            renderImages();
+            document.getElementById('pdfAttachmentContainer').innerHTML = '';
+            document.getElementById('pdfUpload').value = '';
+            document.getElementById('pdfUploadStatus').innerText = 'Tiada PDF dipilih';
+            updatePreview();
+        }
+       
+        async function handleSubmission() {
+            const selectIndex = document.getElementById('inputTajuk').value;
+            if (!selectIndex) { Swal.fire('Ralat', 'Sila pilih Program.', 'warning'); return; }
+            if (!document.getElementById('inputNama').value) { Swal.fire('Ralat', 'Sila isi Nama Pegawai.', 'warning'); return; }
+            
+            const loader = document.getElementById('loadingOverlay'); loader.style.display = 'flex'; document.getElementById('loadingText').innerText = "Menjana PDF...";
+            try {
+                const element = document.getElementById('pdfContent');
+                const opt = {
+                    margin: 0,
+                    filename: 'temp.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, scrollY: 0, letterRendering: true, allowTaint: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                const worker = html2pdf().set(opt).from(element);
+                const pdfBlob = await worker.outputPdf('blob');
+                const arrayBuffer = await pdfBlob.arrayBuffer();
+                const pdfData = btoa(
+                    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+                );
+
+                // Fetch details from the loaded programList based on selected index
+                const prog = (selectIndex === "custom") ? programList[programList.length - 1] : programList[selectIndex];
+                const tajuk = prog['Nama Program'];
+                const rawDate = prog['Tarikh'];
+                const dateStr = rawDate ? rawDate.split('-').reverse().join('') : new Date().toISOString().slice(0,10).replace(/-/g,'');
+               
+                const payload = {
+                    action: 'SEND',
+                    rowIndex: document.getElementById('rowIndex').value,
+                    existingPdfLink: document.getElementById('existingPdfLink').value,
+                    tajuk: tajuk,
+                    lokasi: prog['Lokasi'] || '-',
+                    hari: prog['Hari'] || '-',
+                    tarikhLaksana: prog['Tarikh'] || '-',
+                    tarikhLaporan: new Date().toISOString().slice(0,10), 
+                    masa: `${prog['Masa Mula'] || ''} - ${prog['Masa Akhir'] || ''}`,
+                    penerangan: prog['Penerangan'] || '-',
+                    focus: document.getElementById('inputFocus').value,
+                    improve: document.getElementById('inputImprove').value,
+                    share: document.getElementById('inputShare').value,
+                    senaraiPeserta: document.getElementById('inputPeserta').value,
+                    nama: document.getElementById('inputNama').value,
+                    pdfData: pdfData,
+                    pdfName: `Laporan_${tajuk.replace(/[^a-zA-Z0-9]/g, '_')}_${dateStr}.pdf`
+                };
+
+                await fetchWithRetry(SCRIPT_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+
+                loader.style.display = 'none';
+                Swal.fire({ title: 'Berjaya!', text: 'Laporan dihantar.', icon: 'success', confirmButtonText: 'OK' }).then(() => { resetForm(); });
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                Swal.fire('Ralat', 'Proses gagal.', 'error');
+            }
+        }
+
+        function openAdminAuth() {
+            Swal.fire({
+                title: 'Akses Admin',
+                input: 'password',
+                confirmButtonText: 'Log Masuk',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.value === 'admin123#') {
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    document.getElementById('userPanel').classList.add('hidden');
+                    loadDashboardData();
+                } else if (result.isConfirmed) {
+                    Swal.fire('Gagal', 'Kata laluan salah', 'error');
+                }
+            });
+        }
+        function closeAdmin() { document.getElementById('adminPanel').classList.add('hidden'); document.getElementById('userPanel').classList.remove('hidden'); }
+    </script>
+</body>
+</html>
