@@ -412,7 +412,7 @@
         </div>
     </div>
 
-    <!-- MODAL MAKLUMAT PENUH & KEMASKINI STAF (DISINGKATKAN UNTUK KERINGKASAN) -->
+    <!-- MODAL MAKLUMAT PENUH & KEMASKINI STAF -->
     <div id="staff-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] md:max-h-[85vh] flex flex-col overflow-hidden animate-fade-in">
             <div class="px-4 py-3 md:px-6 md:py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
@@ -443,8 +443,9 @@
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jabatan/Unit</label><input type="text" id="edit-jabatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">E-Mel</label><input type="email" id="edit-emel" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. Telefon</label><input type="text" id="edit-telefon" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                    <div class="sm:col-span-2 mt-1 md:mt-2 pt-2 md:pt-3 border-t border-slate-100"><h4 class="text-xs md:text-sm font-semibold text-slate-700">Maklumat Sijil</h4></div>
+                    <div class="sm:col-span-2 mt-1 md:mt-2 pt-2 md:pt-3 border-t border-slate-100"><h4 class="text-xs md:text-sm font-semibold text-slate-700">Maklumat Sijil & Gambar</h4></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Sijil C&P HMI</label><select id="edit-sijilhmi" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="Tidak">Tidak</option><option value="Ya">Ya</option></select></div>
+                    <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Muat Naik Gambar (Biarkan kosong jika tidak tukar)</label><input type="file" id="edit-gambar" accept="image/*" class="w-full px-3 py-1.5 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Mula</label><input type="date" id="edit-tarikhmula" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Tamat</label><input type="date" id="edit-tarikhtamat" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                 </div>
@@ -456,7 +457,7 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH STAF BAHARU (DISINGKATKAN UNTUK KERINGKASAN) -->
+    <!-- MODAL TAMBAH STAF BAHARU -->
     <div id="add-staff-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] md:max-h-[85vh] flex flex-col overflow-hidden animate-fade-in">
             <div class="px-4 py-3 md:px-6 md:py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
@@ -480,8 +481,9 @@
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jabatan/Unit</label><input type="text" id="add-jabatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">E-Mel</label><input type="email" id="add-emel" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. Telefon</label><input type="text" id="add-telefon" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div class="sm:col-span-2 mt-1 md:mt-2 pt-2 md:pt-3 border-t border-slate-100"><h4 class="text-xs md:text-sm font-semibold text-slate-700">Maklumat Sijil</h4></div>
+                        <div class="sm:col-span-2 mt-1 md:mt-2 pt-2 md:pt-3 border-t border-slate-100"><h4 class="text-xs md:text-sm font-semibold text-slate-700">Maklumat Sijil & Gambar</h4></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Sijil C&P HMI</label><select id="add-sijilhmi" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="Tidak">Tidak</option><option value="Ya">Ya</option></select></div>
+                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Muat Naik Gambar (Opsyenal)</label><input type="file" id="add-gambar" accept="image/*" class="w-full px-3 py-1.5 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Mula</label><input type="date" id="add-tarikhmula" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Tamat</label><input type="date" id="add-tarikhtamat" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     </div>
@@ -494,7 +496,7 @@
                     <div class="p-3 md:p-4 bg-blue-50 text-blue-800 text-xs md:text-sm rounded-lg border border-blue-200">
                         <strong class="flex items-center gap-1 mb-1"><i data-lucide="info" class="w-4 h-4"></i> Panduan:</strong> 
                         Sila <i>copy</i> rekod dari Microsoft Excel / Sheets dan <i>paste</i> di ruang bawah. Pastikan lajur anda mematuhi susunan tepat berikut:<br/><br/>
-                        <code class="bg-blue-100 px-2 py-1 rounded">1. Nama Penuh | 2. No K/P | 3. Umur | 4. Jantina | 5. Jawatan | 6. Jabatan/Unit | 7. E-Mel | 8. No Telefon | 9. Sijil HMI (Ya/Tidak) | 10. Tarikh Mula | 11. Tarikh Tamat</code>
+                        <code class="bg-blue-100 px-2 py-1 rounded">1. Nama Penuh | 2. No K/P | 3. Umur | 4. Jantina | 5. Jawatan | 6. Jabatan/Unit | 7. E-Mel | 8. No Telefon | 9. Sijil HMI (Ya/Tidak) | 10. Tarikh Mula | 11. Tarikh Tamat | 12. Pautan Gambar (Opsyenal)</code>
                     </div>
                     <textarea id="bulk-paste-input" class="w-full h-32 md:h-40 p-3 border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none whitespace-pre" placeholder="Paste data berbilang lajur di sini..."></textarea>
                     <button type="button" onclick="previewBulkData()" class="w-full bg-slate-800 text-white py-2.5 rounded-lg text-sm hover:bg-slate-700 transition-colors font-medium">1. Papar Pratonton (Preview)</button>
@@ -513,7 +515,7 @@
 
     <!-- LOGIK JAVASCRIPT -->
     <script>
-        const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLioAnPFPRKLPgTgD2bgZez4zgNMUBALL_tbI8RvYHsn-YunDbABkkLNxYp08EuoCldg/exec";
+        const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbyba-3g9uW734ynwPDJk0uELdJqX2aPIzHgyzeJ1yrx1A6vk6cCzliM6CEAl9gKYf1Q/exec";
         
         const KURSUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?output=csv';
         const KAKITANGAN_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=484739154&single=true&output=csv';
@@ -709,6 +711,7 @@
                         'JAWATAN': row[4] || '', 'JABATAN/UNIT': row[5] || '', 'E-MEL': row[6] || '',
                         'NO. TELEFON': telNum, 'Sijil C&P HMI': row[8] || '', 'Tarikh Mula Sijil C&P': row[9] || '',
                         'Tarikh Tamat Sijil C&P': row[10] || '', 'Status Sijil': statusSijil,
+                        'GAMBAR': row[11] || '',
                         'Bilangan Kursus': staffCourses.length,
                         'Senarai Kursus': staffCourses.map(c => ({
                             tarikh: c['Timestamp'] || '-', namaProgram: c['Nama Program'] || c['NAMA PROGRAM'] || '-'
@@ -776,12 +779,10 @@
 
         function parseDateString(dateStr) {
             if(!dateStr) return null;
-            let dString = dateStr.split(" ")[0]; // Just in case it's Timestamp "12/5/2023 14:00"
+            let dString = dateStr.split(" ")[0]; 
             let parts = dString.split(/[-/]/);
             if(parts.length === 3) {
-                // Check format, if year is first
                 if (parts[0].length === 4) return new Date(dString); 
-                // Convert DD/MM/YYYY to YYYY-MM-DD
                 return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); 
             }
             return new Date(dString);
@@ -799,10 +800,7 @@
             if(endDate) endDate.setHours(23,59,59,999);
 
             const filteredData = globalPenilaianData.filter(row => {
-                // Program Filter
                 const passesProg = selectedProg === 'all' || (row['Program'] || '').trim() === selectedProg;
-                
-                // Date Filter (Gunakan 'Tarikh Program' jika ada, atau Timestamp)
                 let passesDate = true;
                 let rowDateStr = row['Tarikh Program'] || row['Timestamp'];
                 if ((startDate || endDate) && rowDateStr) {
@@ -820,10 +818,8 @@
         }
 
         function renderPenilaianDashboard(data) {
-            // 1. Jumlah Responden
             document.getElementById('val-penilaian-responden').innerText = data.length;
 
-            // 2. Kira Skor Min Keseluruhan & Kriteria
             let totalOverallScore = 0;
             let validOverallRows = 0;
             let kriteriaScores = {
@@ -844,7 +840,6 @@
                 let rowTotal = 0;
                 let rowValid = 0;
                 
-                // Kira Metrik Kriteria
                 kriteriaCols.forEach((col, idx) => {
                     let val = parseFloat(row[col]);
                     if(!isNaN(val)) {
@@ -861,11 +856,9 @@
                     validOverallRows++;
                 }
 
-                // Demografi Jantina
                 const jantina = row['Jantina'] || 'Tidak Dinyatakan';
                 jantinaCount[jantina] = (jantinaCount[jantina] || 0) + 1;
 
-                // Pendorong Program
                 const pendorong = row['A2_Pendorong'] || 'Lain-lain';
                 pendorongCount[pendorong] = (pendorongCount[pendorong] || 0) + 1;
             });
@@ -873,7 +866,6 @@
             const overallAverage = validOverallRows > 0 ? (totalOverallScore / validOverallRows) : 0;
             document.getElementById('val-penilaian-skormin').innerText = overallAverage.toFixed(2);
 
-            // Tahap Kepuasan
             const elKepuasan = document.getElementById('val-penilaian-kepuasan');
             const iconKepuasan = document.getElementById('icon-kepuasan');
             const bgKepuasan = document.getElementById('icon-bg-kepuasan');
@@ -897,7 +889,6 @@
             }
             lucide.createIcons();
 
-            // Sediakan Data untuk Carta Kriteria
             let radarLabels = [];
             let radarData = [];
             Object.keys(kriteriaScores).forEach(k => {
@@ -906,7 +897,6 @@
                 radarData.push(count > 0 ? (kriteriaScores[k] / count).toFixed(2) : 0);
             });
 
-            // Sediakan Data untuk Carta Pendorong
             const sortedPendorong = Object.keys(pendorongCount).map(k => ({name: k, val: pendorongCount[k]})).sort((a,b) => b.val - a.val);
 
             renderPenilaianCharts(jantinaCount, sortedPendorong, radarLabels, radarData);
@@ -919,7 +909,6 @@
             if (chartPenilaianPendorong) chartPenilaianPendorong.destroy();
             if (chartPenilaianKriteria) chartPenilaianKriteria.destroy();
 
-            // 1. Carta Jantina
             const ctxJant = document.getElementById('chart-penilaian-jantina').getContext('2d');
             chartPenilaianJantina = new Chart(ctxJant, {
                 type: 'doughnut',
@@ -927,7 +916,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } } }
             });
 
-            // 2. Carta Pendorong (Bar Mendatar)
             const ctxPend = document.getElementById('chart-penilaian-pendorong').getContext('2d');
             chartPenilaianPendorong = new Chart(ctxPend, {
                 type: 'bar',
@@ -941,7 +929,6 @@
                 }
             });
 
-            // 3. Carta Kriteria (Bar)
             const ctxKrit = document.getElementById('chart-penilaian-kriteria').getContext('2d');
             chartPenilaianKriteria = new Chart(ctxKrit, {
                 type: 'bar',
@@ -952,7 +939,7 @@
                 options: {
                     responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, max: 5.0, grid: { color: '#e2e8f0' } }, // Andaian skor max 5
+                        y: { beginAtZero: true, max: 5.0, grid: { color: '#e2e8f0' } }, 
                         x: { grid: { display: false } }
                     }
                 }
@@ -961,7 +948,7 @@
 
 
         // ==============================================================
-        // LOGIK DATABASE STAF DAN UTILITIES (KEKAL)
+        // LOGIK DATABASE STAF DAN UTILITIES 
         // ==============================================================
         function verifyPassword(e) {
             e.preventDefault();
@@ -1154,6 +1141,8 @@
                 if(sijilVal.toLowerCase() === 'ya') document.getElementById('edit-sijilhmi').value = 'Ya';
                 else document.getElementById('edit-sijilhmi').value = 'Tidak';
 
+                document.getElementById('edit-gambar').value = ''; // Reset input gambar
+
                 const formatToDateInput = (dateStr) => {
                     if (!dateStr) return '';
                     const parts = dateStr.split(/[-/]/);
@@ -1180,6 +1169,24 @@
             btnSubmit.disabled = true; lucide.createIcons();
 
             try {
+                // Proses Gambar kepada Base64
+                const gambarInput = document.getElementById('edit-gambar');
+                let gambarBase64 = "";
+                let gambarMimeType = "";
+                let gambarName = "";
+
+                if (gambarInput && gambarInput.files.length > 0) {
+                    const file = gambarInput.files[0];
+                    gambarName = file.name;
+                    gambarMimeType = file.type;
+                    gambarBase64 = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    });
+                }
+
                 const formData = new FormData();
                 formData.append('action', 'editStaff');
                 formData.append('original_ic', currentEditStaff['NO. K/P']); 
@@ -1199,6 +1206,11 @@
                 formData.append('tarikh_mula', formatToSave(document.getElementById('edit-tarikhmula').value));
                 formData.append('tarikh_tamat', formatToSave(document.getElementById('edit-tarikhtamat').value));
 
+                // Tambah parameter gambar
+                formData.append('gambar_base64', gambarBase64);
+                formData.append('gambar_mimetype', gambarMimeType);
+                formData.append('gambar_name', gambarName);
+
                 const response = await fetch(APPSCRIPT_URL, { method: 'POST', body: formData });
                 const result = await response.json();
                 
@@ -1206,7 +1218,10 @@
                     alert('Maklumat berjaya dikemaskini!');
                     closeModal(); loadData(); 
                 } else alert('Ralat: ' + result.message);
-            } catch (err) { alert('Ralat teknikal. Sila cuba lagi.'); console.error(err); }
+            } catch (err) { 
+                alert('Ralat teknikal. Sila cuba lagi.'); 
+                console.error(err);
+            }
             finally { btnSubmit.innerHTML = originalBtnHTML; btnSubmit.disabled = false; lucide.createIcons(); }
         }
 
@@ -1220,6 +1235,7 @@
             document.getElementById('add-staff-modal').classList.add('hidden');
             document.getElementById('add-staff-modal').classList.remove('flex');
             document.getElementById('add-individu-form').reset();
+            document.getElementById('add-gambar').value = ""; // Reset gambar
             document.getElementById('bulk-paste-input').value = '';
             document.getElementById('bulk-preview-area').classList.add('hidden');
             pendingBulkData = [];
@@ -1254,6 +1270,24 @@
             btnSubmit.disabled = true; lucide.createIcons();
 
             try {
+                // Proses Gambar kepada Base64
+                const gambarInput = document.getElementById('add-gambar');
+                let gambarBase64 = "";
+                let gambarMimeType = "";
+                let gambarName = "";
+
+                if (gambarInput && gambarInput.files.length > 0) {
+                    const file = gambarInput.files[0];
+                    gambarName = file.name;
+                    gambarMimeType = file.type;
+                    gambarBase64 = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(',')[1]); // Ambil data selepas "base64,"
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    });
+                }
+
                 const formData = new FormData();
                 formData.append('action', 'addStaff');
                 formData.append('nama', document.getElementById('add-nama').value);
@@ -1271,6 +1305,11 @@
                 formData.append('sijil_hmi', document.getElementById('add-sijilhmi').value);
                 formData.append('tarikh_mula', formatToSave(document.getElementById('add-tarikhmula').value));
                 formData.append('tarikh_tamat', formatToSave(document.getElementById('add-tarikhtamat').value));
+                
+                // Tambah parameter gambar ke formData
+                formData.append('gambar_base64', gambarBase64);
+                formData.append('gambar_mimetype', gambarMimeType);
+                formData.append('gambar_name', gambarName);
 
                 const response = await fetch(APPSCRIPT_URL, { method: 'POST', body: formData });
                 const result = await response.json();
@@ -1279,7 +1318,10 @@
                     alert('Rekod Staf baharu berjaya disimpan!');
                     closeAddStaffModal(); loadData(); 
                 } else alert('Ralat: ' + result.message);
-            } catch (err) { alert('Ralat teknikal. Sila cuba lagi.'); }
+            } catch (err) { 
+                alert('Ralat teknikal. Sila cuba lagi.'); 
+                console.error(err);
+            }
             finally { btnSubmit.innerHTML = originalBtnHTML; btnSubmit.disabled = false; lucide.createIcons(); }
         }
 
@@ -1307,7 +1349,8 @@
                             nama: row[0] || '', ic: row[1] || '', umur: row[2] || '', jantina: row[3] || '',
                             jawatan: row[4] || '', jabatan: row[5] || '', emel: row[6] || '', 
                             telefon: tNum, telefonPaparan: tNumDisplay,
-                            sijil_hmi: row[8] || '', tarikh_mula: row[9] || '', tarikh_tamat: row[10] || ''
+                            sijil_hmi: row[8] || '', tarikh_mula: row[9] || '', tarikh_tamat: row[10] || '',
+                            gambar_url: row[11] || '' // Boleh terima link jika dipaste dari Excel (Lajur ke-12)
                         };
                     });
 
@@ -1373,8 +1416,28 @@
             document.getElementById('tab-database').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // Tukar pautan GDrive kepada format lh3
+        function getDriveImageLH3(url) {
+            if (!url) return '';
+            let fileId = '';
+            const match1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match1) fileId = match1[1];
+            else {
+                const match2 = url.match(/id=([a-zA-Z0-9_-]+)/);
+                if (match2) fileId = match2[1];
+            }
+            if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}`;
+            return url;
+        }
+
         function renderStaffProfile(targetPrefix, staff) {
+            const imgUrl = getDriveImageLH3(staff['GAMBAR']);
+            const avatarHTML = imgUrl 
+                ? `<div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md mx-auto mb-4 bg-slate-100 shrink-0"><img src="${imgUrl}" alt="Gambar Staf" class="w-full h-full object-cover"></div>`
+                : `<div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-md mx-auto mb-4 bg-slate-200 flex items-center justify-center shrink-0"><i data-lucide="user" class="w-12 h-12 text-slate-400"></i></div>`;
+
             const gridHTML = `
+                <div class="sm:col-span-2 flex justify-center">${avatarHTML}</div>
                 <div><p class="text-[11px] md:text-xs text-slate-500 font-medium">Nama Penuh</p><p class="font-semibold text-slate-800 text-sm">${staff['NAMA PENUH'] || '-'}</p></div>
                 <div><p class="text-[11px] md:text-xs text-slate-500 font-medium">No. K/P</p><p class="font-semibold text-slate-800 text-sm">${staff['NO. K/P'] || '-'}</p></div>
                 <div><p class="text-[11px] md:text-xs text-slate-500 font-medium">Jawatan & Jabatan</p><p class="font-semibold text-slate-800 text-sm">${staff['JAWATAN'] || '-'}, ${staff['JABATAN/UNIT'] || '-'}</p></div>
@@ -1411,6 +1474,9 @@
                 kursusHTML = `<div class="text-center py-5 md:py-6 bg-slate-50 rounded-lg border border-slate-100 border-dashed"><p class="text-xs md:text-sm text-slate-500">Tiada rekod kursus dijumpai untuk staf ini.</p></div>`;
             }
             document.getElementById(`${targetPrefix}-kursus-container`).innerHTML = kursusHTML;
+            
+            // Re-render icon untuk avatar default jika tiada gambar
+            setTimeout(() => lucide.createIcons(), 10);
         }
 
         function renderRecentTable() {
