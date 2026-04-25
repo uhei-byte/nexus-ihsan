@@ -475,7 +475,7 @@
 
                         <!-- Footer Page 1 -->
                         <div class="mt-4 pt-3 border-t-2 border-slate-300 flex justify-end">
-                            <p class="text-[10px] text-slate-500 font-medium">© 2026 All Right Reserved by UHEI Institut Kanser Negara</p>
+                            <p class="text-[10px] text-slate-500 font-medium">© 2026 Hak Cipta Terpelihara oleh UHEI Institut Kanser Negara</p>
                         </div>
                     </div>
 
@@ -500,7 +500,7 @@
                                 <p class="text-[10px] text-slate-500 mb-1 uppercase tracking-wide font-bold">Disediakan Oleh:</p>
                                 <p id="prevNama" class="text-sm font-bold text-slate-900 uppercase">...</p>
                             </div>
-                            <p class="text-[10px] text-slate-500 font-medium">© 2026 All Right Reserved by UHEI Institut Kanser Negara</p>
+                            <p class="text-[10px] text-slate-500 font-medium">© 2026 Hak Cipta Terpelihara oleh UHEI Institut Kanser Negara</p>
                         </div>
                     </div>
 
@@ -522,12 +522,6 @@
         
         // Program List CSV (Dropdown)
         const PROGRAM_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=553481558&single=true&output=csv";
-
-        // Setup PDF.js Worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-
-        // Set Chart.js globally for crispness
-        Chart.defaults.devicePixelRatio = 3;
 
         let evidenceImages = [];
         let chartInstanceBulanTahun = null;
@@ -563,6 +557,15 @@
 
         // --- INITIALIZATION ---
         window.onload = function() {
+            // Sediakan tetapan global untuk Chart.js dan PDF.js di sini 
+            // supaya tiada ralat rujukan (ReferenceError) pada mulanya.
+            if (typeof pdfjsLib !== 'undefined') {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            }
+            if (typeof Chart !== 'undefined') {
+                Chart.defaults.devicePixelRatio = 3;
+            }
+            
             loadProgramDropdown();
         };
 
@@ -940,10 +943,10 @@
             }
 
             [...data].reverse().forEach((row, index) => {
-                const tr = document.createElement('tr');
                 const originalIndex = allAdminReports.indexOf(row);
                 const sheetRowIndex = originalIndex + 2;
 
+                const tr = document.createElement('tr');
                 tr.id = `row-${sheetRowIndex}`;
 
                 let dateStr = formatDateOnly(row['Timestamp']);
@@ -1114,14 +1117,52 @@
             const panel = document.getElementById('searchResultPanel');
             const tbody = document.getElementById('searchTableBody');
             tbody.innerHTML = '';
+            
             reports.forEach(report => {
                 const dateStr = formatDateOnly(report.timestamp);
                 const statusBadge = report.status === 'HANTAR' ? '<span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded font-bold">HANTAR</span>' : (report.status === 'TELAH DISEMAK' ? '<span class="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded font-bold">DISEMAK</span>' : '<span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-bold">DRAFT</span>');
+                
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${dateStr}</td><td class="font-medium">${report.tajuk}</td><td>${statusBadge}</td><td><div class="flex gap-2"><button onclick='loadReportForEdit(${JSON.stringify(report)})' class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"><i class="fas fa-edit"></i></button><button onclick="deleteReport('${report.rowIndex}')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button></div></td>`;
+                
+                const tdDate = document.createElement('td');
+                tdDate.textContent = dateStr;
+                
+                const tdTajuk = document.createElement('td');
+                tdTajuk.className = "font-medium";
+                tdTajuk.textContent = report.tajuk;
+                
+                const tdStatus = document.createElement('td');
+                tdStatus.innerHTML = statusBadge;
+                
+                const tdAction = document.createElement('td');
+                const divAction = document.createElement('div');
+                divAction.className = "flex gap-2";
+                
+                // FIXED: Menggunakan addEventListener / onClick secara objek untuk elak ralat sintaks JSON
+                const btnEdit = document.createElement('button');
+                btnEdit.className = "bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600";
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEdit.onclick = () => loadReportForEdit(report);
+                
+                const btnDelete = document.createElement('button');
+                btnDelete.className = "bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600";
+                btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
+                btnDelete.onclick = () => deleteReport(report.rowIndex);
+                
+                divAction.appendChild(btnEdit);
+                divAction.appendChild(btnDelete);
+                tdAction.appendChild(divAction);
+                
+                tr.appendChild(tdDate);
+                tr.appendChild(tdTajuk);
+                tr.appendChild(tdStatus);
+                tr.appendChild(tdAction);
+                
                 tbody.appendChild(tr);
             });
-            panel.style.display = 'block'; panel.scrollIntoView({ behavior: 'smooth' });
+            
+            panel.style.display = 'block'; 
+            panel.scrollIntoView({ behavior: 'smooth' });
         }
        
         function closeSearchPanel() { document.getElementById('searchResultPanel').style.display = 'none'; }
@@ -1212,45 +1253,53 @@
 
                 const worker = html2pdf().set(opt).from(element);
                 const pdfBlob = await worker.outputPdf('blob');
-                const arrayBuffer = await pdfBlob.arrayBuffer();
-                const pdfData = btoa(
-                    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-                );
+                
+                // FIXED: Convert fail Blob ke Base64 dengan cara selamat (cegah had memori)
+                const reader = new FileReader();
+                reader.readAsDataURL(pdfBlob);
+                reader.onloadend = async function() {
+                    const base64data = reader.result.split(',')[1];
 
-                // Fetch details from the loaded programList based on selected index
-                const prog = (selectIndex === "custom") ? programList[programList.length - 1] : programList[selectIndex];
-                const tajuk = prog['Nama Program'];
-                const rawDate = prog['Tarikh'];
-                const dateStr = rawDate ? rawDate.split('-').reverse().join('') : new Date().toISOString().slice(0,10).replace(/-/g,'');
-               
-                const payload = {
-                    action: 'SEND',
-                    rowIndex: document.getElementById('rowIndex').value,
-                    existingPdfLink: document.getElementById('existingPdfLink').value,
-                    tajuk: tajuk,
-                    lokasi: prog['Lokasi'] || '-',
-                    hari: prog['Hari'] || '-',
-                    tarikhLaksana: prog['Tarikh'] || '-',
-                    tarikhLaporan: new Date().toISOString().slice(0,10), 
-                    masa: `${prog['Masa Mula'] || ''} - ${prog['Masa Akhir'] || ''}`,
-                    penerangan: prog['Penerangan'] || '-',
-                    focus: document.getElementById('inputFocus').value,
-                    improve: document.getElementById('inputImprove').value,
-                    share: document.getElementById('inputShare').value,
-                    senaraiPeserta: document.getElementById('inputPeserta').value,
-                    nama: document.getElementById('inputNama').value,
-                    pdfData: pdfData,
-                    pdfName: `Laporan_${tajuk.replace(/[^a-zA-Z0-9]/g, '_')}_${dateStr}.pdf`
+                    // Fetch details from the loaded programList based on selected index
+                    const prog = (selectIndex === "custom") ? programList[programList.length - 1] : programList[selectIndex];
+                    const tajuk = prog['Nama Program'];
+                    const rawDate = prog['Tarikh'];
+                    const dateStr = rawDate ? rawDate.split('-').reverse().join('') : new Date().toISOString().slice(0,10).replace(/-/g,'');
+                   
+                    const payload = {
+                        action: 'SEND',
+                        rowIndex: document.getElementById('rowIndex').value,
+                        existingPdfLink: document.getElementById('existingPdfLink').value,
+                        tajuk: tajuk,
+                        lokasi: prog['Lokasi'] || '-',
+                        hari: prog['Hari'] || '-',
+                        tarikhLaksana: prog['Tarikh'] || '-',
+                        tarikhLaporan: new Date().toISOString().slice(0,10), 
+                        masa: `${prog['Masa Mula'] || ''} - ${prog['Masa Akhir'] || ''}`,
+                        penerangan: prog['Penerangan'] || '-',
+                        focus: document.getElementById('inputFocus').value,
+                        improve: document.getElementById('inputImprove').value,
+                        share: document.getElementById('inputShare').value,
+                        senaraiPeserta: document.getElementById('inputPeserta').value,
+                        nama: document.getElementById('inputNama').value,
+                        pdfData: base64data,
+                        pdfName: `Laporan_${tajuk.replace(/[^a-zA-Z0-9]/g, '_')}_${dateStr}.pdf`
+                    };
+
+                    try {
+                        await fetchWithRetry(SCRIPT_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+                        loader.style.display = 'none';
+                        Swal.fire({ title: 'Berjaya!', text: 'Laporan dihantar.', icon: 'success', confirmButtonText: 'OK' }).then(() => { resetForm(); });
+                    } catch (submitError) {
+                        console.error(submitError);
+                        loader.style.display = 'none';
+                        Swal.fire('Ralat', 'Proses muat naik gagal.', 'error');
+                    }
                 };
-
-                await fetchWithRetry(SCRIPT_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-
-                loader.style.display = 'none';
-                Swal.fire({ title: 'Berjaya!', text: 'Laporan dihantar.', icon: 'success', confirmButtonText: 'OK' }).then(() => { resetForm(); });
             } catch (error) {
                 console.error(error);
                 loader.style.display = 'none';
-                Swal.fire('Ralat', 'Proses gagal.', 'error');
+                Swal.fire('Ralat', 'Proses menjana PDF gagal.', 'error');
             }
         }
 
