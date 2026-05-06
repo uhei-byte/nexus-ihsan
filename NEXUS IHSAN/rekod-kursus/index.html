@@ -60,7 +60,7 @@
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 <span>Portal Pendaftaran</span>
             </a>
-            <button id="btn-reload" onclick="loadData()" class="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 md:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-sm md:text-base shadow-sm">
+            <button id="btn-reload" onclick="loadData(true)" class="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 md:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-sm md:text-base shadow-sm">
                 <i data-lucide="refresh-cw" id="icon-reload" class="w-4 h-4"></i>
                 <span id="text-reload">Muat Semula</span>
             </button>
@@ -438,7 +438,7 @@
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Nama Penuh</label><input type="text" id="edit-nama" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. K/P</label><input type="text" id="edit-ic" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Umur (Auto)</label><input type="number" id="edit-umur" class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-md text-xs md:text-sm focus:outline-none" readonly></div>
-                    <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jantina</label><select id="edit-jantina" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="">Sila Pilih</option><option value="Lelaki">Lelaki</option><option value="Perempuan">Perempuan</option></select></div>
+                    <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jantina</label><select id="edit-jantina" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="">Sila Pilih</option><option value="Lelaki">Lelaki</option><option value="Wanita">Wanita</option></select></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jawatan</label><input type="text" id="edit-jawatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jabatan/Unit</label><input type="text" id="edit-jabatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                     <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">E-Mel</label><input type="email" id="edit-emel" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
@@ -476,7 +476,7 @@
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Nama Penuh</label><input type="text" id="add-nama" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. K/P</label><input type="text" id="add-ic" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Umur (Auto)</label><input type="number" id="add-umur" class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-md text-xs md:text-sm focus:outline-none" readonly></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jantina</label><select id="add-jantina" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="">Sila Pilih</option><option value="Lelaki">Lelaki</option><option value="Perempuan">Perempuan</option></select></div>
+                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jantina</label><select id="add-jantina" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="">Sila Pilih</option><option value="Lelaki">Lelaki</option><option value="Wanita">Wanita</option></select></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jawatan</label><input type="text" id="add-jawatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jabatan/Unit</label><input type="text" id="add-jabatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                         <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">E-Mel</label><input type="email" id="add-emel" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
@@ -614,7 +614,7 @@
             }
         }
 
-        async function loadData() {
+        async function loadData(preserveState = false) {
             document.getElementById('loading-container').classList.remove('hidden');
             document.getElementById('main-content').classList.add('hidden');
             document.getElementById('error-container').classList.add('hidden');
@@ -720,7 +720,7 @@
                 });
                 
                 populateJabatanFilter();
-                applyFilters();
+                applyFilters(preserveState);
 
                 const programCount = {}; const jantinaCount = {};
                 kursusData.forEach(row => {
@@ -765,6 +765,7 @@
         // ==============================================================
         function populatePenilaianFilters() {
             const select = document.getElementById('filter-penilaian-program');
+            const currentVal = select.value;
             const progSet = new Set();
             globalPenilaianData.forEach(row => {
                 if (row['Program'] && row['Program'].trim() !== '') progSet.add(row['Program'].trim());
@@ -775,6 +776,12 @@
                 const opt = document.createElement('option');
                 opt.value = p; opt.textContent = p; select.appendChild(opt);
             });
+
+            if (currentVal && currentVal !== 'all') {
+                if (Array.from(select.options).some(opt => opt.value === currentVal)) {
+                    select.value = currentVal;
+                }
+            }
         }
 
         function parseDateString(dateStr) {
@@ -970,6 +977,7 @@
 
         function populateJabatanFilter() {
             const select = document.getElementById('filter-jabatan');
+            const currentVal = select.value;
             const jabatanSet = new Set();
             globalStaffDatabase.forEach(staff => {
                 if (staff['JABATAN/UNIT'] && staff['JABATAN/UNIT'].trim() !== '') jabatanSet.add(staff['JABATAN/UNIT'].trim());
@@ -980,9 +988,15 @@
                 const opt = document.createElement('option');
                 opt.value = j; opt.textContent = j; select.appendChild(opt);
             });
+
+            if (currentVal && currentVal !== 'all') {
+                if (Array.from(select.options).some(opt => opt.value === currentVal)) {
+                    select.value = currentVal;
+                }
+            }
         }
 
-        function applyFilters() {
+        function applyFilters(preservePage = false) {
             const searchText = document.getElementById('input-search-db').value.toLowerCase();
             const selectedJabatan = document.getElementById('filter-jabatan').value;
             const selectedSijil = document.getElementById('filter-sijil').value;
@@ -995,7 +1009,14 @@
                 const passesSijil = selectedSijil === 'all' || staff['Status Sijil'] === selectedSijil || (selectedSijil === 'ada' && staff['Status Sijil'] !== 'tiada');
                 return passesSearch && passesJabatan && passesSijil;
             });
-            currentPage = 1;
+            
+            if (preservePage === true) {
+                const totalPages = Math.ceil(filteredStaffDatabase.length / itemsPerPage);
+                if (currentPage > totalPages) currentPage = totalPages || 1;
+            } else {
+                currentPage = 1;
+            }
+            
             renderDatabaseTable();
         }
 
@@ -1056,9 +1077,9 @@
             renderDatabaseTable();
         }
 
-        document.getElementById('input-search-db').addEventListener('input', applyFilters);
-        document.getElementById('filter-jabatan').addEventListener('change', applyFilters);
-        document.getElementById('filter-sijil').addEventListener('change', applyFilters);
+        document.getElementById('input-search-db').addEventListener('input', () => applyFilters(false));
+        document.getElementById('filter-jabatan').addEventListener('change', () => applyFilters(false));
+        document.getElementById('filter-sijil').addEventListener('change', () => applyFilters(false));
 
         function formatICNumber(input) {
             let value = input.value.replace(/\D/g, '');
@@ -1090,7 +1111,7 @@
             const name = inputElement.value.toLowerCase();
             const jantinaSelect = document.getElementById(targetSelectId);
             if (name.includes(' bin ') || name.endsWith(' bin')) jantinaSelect.value = 'Lelaki';
-            else if (name.includes(' binti ') || name.endsWith(' binti')) jantinaSelect.value = 'Perempuan';
+            else if (name.includes(' binti ') || name.endsWith(' binti')) jantinaSelect.value = 'Wanita';
         }
         document.getElementById('edit-nama').addEventListener('input', function() { autoJantina(this, 'edit-jantina'); });
         document.getElementById('add-nama').addEventListener('input', function() { autoJantina(this, 'add-jantina'); });
@@ -1128,7 +1149,7 @@
                 
                 let jantinaVal = currentEditStaff['JANTINA'] || '';
                 if (jantinaVal.toLowerCase() === 'lelaki') document.getElementById('edit-jantina').value = 'Lelaki';
-                else if (jantinaVal.toLowerCase() === 'perempuan') document.getElementById('edit-jantina').value = 'Perempuan';
+                else if (jantinaVal.toLowerCase() === 'wanita') document.getElementById('edit-jantina').value = 'Wanita';
                 else document.getElementById('edit-jantina').value = '';
 
                 document.getElementById('edit-jawatan').value = currentEditStaff['JAWATAN'] || '';
@@ -1216,7 +1237,7 @@
                 
                 if (result.result === 'success') {
                     alert('Maklumat berjaya dikemaskini!');
-                    closeModal(); loadData(); 
+                    closeModal(); loadData(true); 
                 } else alert('Ralat: ' + result.message);
             } catch (err) { 
                 alert('Ralat teknikal. Sila cuba lagi.'); 
@@ -1316,7 +1337,7 @@
                 
                 if (result.result === 'success') {
                     alert('Rekod Staf baharu berjaya disimpan!');
-                    closeAddStaffModal(); loadData(); 
+                    closeAddStaffModal(); loadData(true); 
                 } else alert('Ralat: ' + result.message);
             } catch (err) { 
                 alert('Ralat teknikal. Sila cuba lagi.'); 
@@ -1401,7 +1422,7 @@
                 
                 if (result.result === 'success') {
                     alert(`${pendingBulkData.length} Rekod Staf berjaya disimpan secara pukal!`);
-                    closeAddStaffModal(); loadData(); 
+                    closeAddStaffModal(); loadData(true); 
                 } else alert('Ralat: ' + result.message);
             } catch (err) { alert('Ralat teknikal. Sila cuba lagi.'); }
             finally { btnSubmit.innerHTML = originalBtnHTML; btnSubmit.disabled = false; lucide.createIcons(); }
@@ -1412,7 +1433,7 @@
             document.getElementById('input-search-db').value = '';
             document.getElementById('filter-jabatan').value = 'all';
             document.getElementById('filter-sijil').value = sijilStatus;
-            applyFilters();
+            applyFilters(false);
             document.getElementById('tab-database').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1548,7 +1569,7 @@
             }
         });
 
-        window.onload = loadData;
+        window.onload = () => loadData(false);
     </script>
 </body>
 </html>
