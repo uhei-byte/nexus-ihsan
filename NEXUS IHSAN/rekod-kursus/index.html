@@ -1010,10 +1010,10 @@
             const endIndex = startIndex + itemsPerPage;
             const currentData = filteredStaffDatabase.slice(startIndex, endIndex);
 
-            currentData.forEach((row) => {
+            currentData.forEach((row, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-slate-50";
-                const rowDataStr = JSON.stringify(row).replace(/"/g, '&quot;');
+                const absoluteIndex = startIndex + index;
                 tr.innerHTML = `
                     <td class="px-4 py-3 md:px-6 md:py-4 font-medium text-slate-900">${row['NAMA PENUH'] || '-'}</td>
                     <td class="px-4 py-3 md:px-6 md:py-4 text-slate-600">${row['JAWATAN'] || '-'}</td>
@@ -1021,7 +1021,7 @@
                     <td class="px-4 py-3 md:px-6 md:py-4 text-slate-600">${row['JABATAN/UNIT'] || '-'}</td>
                     <td class="px-4 py-3 md:px-6 md:py-4 font-bold text-center text-indigo-600">${row['Bilangan Kursus']}</td>
                     <td class="px-4 py-3 md:px-6 md:py-4 text-center">
-                        <button onclick="openModal('${rowDataStr}')" class="inline-flex items-center gap-1 px-3 py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium transition-colors">
+                        <button onclick="openModal(${absoluteIndex})" class="inline-flex items-center gap-1 px-3 py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium transition-colors">
                             <i data-lucide="eye" class="w-3.5 h-3.5"></i> Lihat
                         </button>
                     </td>
@@ -1102,8 +1102,8 @@
             return dateStr;
         };
 
-        function openModal(staffDataStr) {
-            const staff = JSON.parse(staffDataStr);
+        function openModal(staffIndex) {
+            const staff = filteredStaffDatabase[staffIndex];
             currentEditStaff = staff; 
             renderStaffProfile('modal', staff);
             toggleEditMode(false); 
