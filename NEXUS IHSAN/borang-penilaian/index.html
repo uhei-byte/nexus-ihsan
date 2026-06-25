@@ -100,11 +100,25 @@
                     </h2>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Penuh <span class="text-red-500">*</span></label>
-                        <select id="nama" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5 bg-gray-50">
-                            <option value="">-- Memuat turun data... --</option>
-                        </select>
+                    <!-- Nama Penuh: searchable combobox - boleh taip untuk filter ATAU klik untuk tengok semua senarai -->
+                    <div class="md:col-span-2 relative">
+                        <label for="namaSearch" class="block text-sm font-medium text-gray-700 mb-1">Nama Penuh <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="namaSearch"
+                                autocomplete="off"
+                                disabled
+                                placeholder="-- Memuat turun data... --"
+                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5 bg-gray-50 pr-10 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                            <input type="hidden" id="namaIndex" value="">
+                            <svg class="w-5 h-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <!-- Senarai cadangan nama (muncul bila focus / taip) -->
+                            <div id="namaDropdownList" class="hidden absolute z-20 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto"></div>
+                        </div>
                     </div>
 
                     <div>
@@ -354,19 +368,21 @@
                     }
                 });
 
-                // Fetch Peserta
+                // Fetch Peserta (data sahaja - paparan guna search box, bukan dropdown biasa)
                 const uRes = await fetch(userUrl);
                 const uText = await uRes.text();
                 const uRows = parseCSV(uText).slice(1); // Buang baris header
-                
-                const namaSelect = document.getElementById('nama');
-                namaSelect.innerHTML = '<option value="">-- Sila Pilih Nama Penuh --</option>';
-                uRows.forEach((row, idx) => {
+
+                uRows.forEach((row) => {
                     if(row[0]) {
                         participantsData.push(row);
-                        namaSelect.innerHTML += `<option value="${idx}">${row[0]}</option>`;
                     }
                 });
+
+                // Aktifkan search box nama sebaik data siap dimuat
+                const namaSearchEl = document.getElementById('namaSearch');
+                namaSearchEl.disabled = false;
+                namaSearchEl.placeholder = 'Taip nama atau klik untuk pilih dari senarai...';
 
             } catch (err) {
                 console.error("Ralat mengambil data:", err);
@@ -427,11 +443,42 @@
             }
         });
 
-        // --- 5. Auto-populate Peserta Details dari CSV ---
-        document.getElementById('nama').addEventListener('change', function(e) {
-            const val = e.target.value;
-            if(val !== "" && participantsData[val]) {
-                const row = participantsData[val];
+        // --- 5. Searchable Combobox - Nama Penuh Peserta ---
+        let selectedNamaIndex = null;   // index peserta yang DISAHKAN dipilih (string, dari data-idx)
+        let highlightedIndex = -1;      // index aktif untuk navigasi keyboard
+
+        const namaSearchInput  = document.getElementById('namaSearch');
+        const namaIndexInput   = document.getElementById('namaIndex');
+        const namaDropdownList = document.getElementById('namaDropdownList');
+
+        // Bina semula senarai cadangan ikut filter text
+        function renderNamaOptions(filterText = '') {
+            const keyword = filterText.trim().toLowerCase();
+            const filtered = participantsData
+                .map((row, idx) => ({ row, idx }))
+                .filter(item => item.row[0] && item.row[0].toLowerCase().includes(keyword));
+
+            highlightedIndex = -1;
+
+            if (filtered.length === 0) {
+                namaDropdownList.innerHTML = `<div class="p-3 text-sm text-gray-500 text-center">Nama tidak ditemui</div>`;
+            } else {
+                namaDropdownList.innerHTML = filtered.map(item => {
+                    const subInfo = [item.row[4], item.row[5]].filter(Boolean).join(' • '); // Jawatan • Jabatan
+                    return `
+                        <div class="nama-option px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-0" data-idx="${item.idx}">
+                            <div class="font-medium text-gray-800">${item.row[0]}</div>
+                            ${subInfo ? `<div class="text-xs text-gray-400">${subInfo}</div>` : ''}
+                        </div>`;
+                }).join('');
+            }
+            namaDropdownList.classList.remove('hidden');
+        }
+
+        // Isi (atau kosongkan) field IC/Umur/Jantina/Jawatan/Jabatan
+        function populateParticipantDetails(idx) {
+            if (idx !== null && idx !== '' && participantsData[idx]) {
+                const row = participantsData[idx];
                 // Mengikut struktur Column A-F GID 2136076301
                 document.getElementById('ic').value = row[1] || '';      // Col B
                 document.getElementById('umur').value = row[2] || '';    // Col C
@@ -445,6 +492,75 @@
                 document.getElementById('jawatan').value = '';
                 document.getElementById('jabatan').value = '';
             }
+        }
+
+        // Lock-in pilihan nama
+        function selectNamaOption(idx) {
+            selectedNamaIndex = idx;
+            namaIndexInput.value = idx;
+            namaSearchInput.value = participantsData[idx][0];
+            namaDropdownList.classList.add('hidden');
+            populateParticipantDetails(idx);
+        }
+
+        // Taip = filter live + reset pilihan lama (sebab nama belum disahkan semula)
+        namaSearchInput.addEventListener('input', function(e) {
+            selectedNamaIndex = null;
+            namaIndexInput.value = '';
+            populateParticipantDetails(null);
+            renderNamaOptions(e.target.value);
+        });
+
+        // Klik/focus box = terus tunjuk senarai (ikut apa yang ditaip setakat ini, atau semua kalau kosong)
+        namaSearchInput.addEventListener('focus', function(e) {
+            renderNamaOptions(e.target.value);
+        });
+
+        // Navigasi keyboard: ↑↓ untuk highlight, Enter untuk pilih, Esc untuk tutup
+        namaSearchInput.addEventListener('keydown', function(e) {
+            const options = namaDropdownList.querySelectorAll('.nama-option');
+            if (namaDropdownList.classList.contains('hidden') || options.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
+                updateHighlight(options);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightedIndex = Math.max(highlightedIndex - 1, 0);
+                updateHighlight(options);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (highlightedIndex >= 0 && options[highlightedIndex]) {
+                    selectNamaOption(options[highlightedIndex].getAttribute('data-idx'));
+                }
+            } else if (e.key === 'Escape') {
+                namaDropdownList.classList.add('hidden');
+            }
+        });
+
+        function updateHighlight(options) {
+            options.forEach((opt, i) => {
+                opt.classList.toggle('bg-blue-50', i === highlightedIndex);
+            });
+            if (options[highlightedIndex]) {
+                options[highlightedIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        // Klik pada salah satu cadangan nama
+        namaDropdownList.addEventListener('click', function(e) {
+            const target = e.target.closest('.nama-option');
+            if (target) {
+                selectNamaOption(target.getAttribute('data-idx'));
+            }
+        });
+
+        // Tutup senarai bila klik di luar kotak carian / senarai
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#namaSearch') && !e.target.closest('#namaDropdownList')) {
+                namaDropdownList.classList.add('hidden');
+            }
         });
 
         // --- 6. Form Submission Handle ---
@@ -456,19 +572,28 @@
 
         document.getElementById('penilaianForm').addEventListener('submit', async function(e) {
             e.preventDefault(); // Mengelakkan page refresh bila disubmit
+
+            // Validasi: nama MESTI dipilih dari senarai (bukan sekadar ditaip)
+            // - supaya IC/Jantina/Umur/Jawatan/Jabatan yang auto-fill confirm betul padan dengan data
+            if (selectedNamaIndex === null || selectedNamaIndex === '') {
+                alert("Sila pilih nama anda daripada senarai cadangan yang dipaparkan.");
+                namaSearchInput.focus();
+                renderNamaOptions(namaSearchInput.value);
+                return;
+            }
             
             // Tukar teks butang kepada 'Sedang Hantar...' & matikan klik ganda
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.innerHTML = 'Sedang Hantar... <svg class="animate-spin inline-block w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
             submitBtn.disabled = true;
 
-            // Kumpul semua data dari form (dropdown ambil teks penuh, bukan value index)
+            // Kumpul semua data dari form
             const payload = {
                 program: document.getElementById('programId').options[document.getElementById('programId').selectedIndex].text,
                 tarikh: document.getElementById('p_tarikh').innerText,
                 masa: document.getElementById('p_masa').innerText,
                 lokasi: document.getElementById('p_lokasi').innerText,
-                nama: document.getElementById('nama').options[document.getElementById('nama').selectedIndex].text,
+                nama: namaSearchInput.value,
                 ic: document.getElementById('ic').value,
                 jantina: document.getElementById('jantina').value,
                 umur: document.getElementById('umur').value,
@@ -530,6 +655,12 @@
                 modal.classList.remove('flex');
                 document.getElementById('penilaianForm').reset();
                 document.getElementById('programDetails').classList.add('hidden');
+
+                // Reset state custom search box Nama Penuh
+                selectedNamaIndex = null;
+                namaIndexInput.value = '';
+                namaDropdownList.classList.add('hidden');
+                namaDropdownList.innerHTML = '';
             }, 200);
         }
 
