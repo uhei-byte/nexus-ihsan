@@ -76,7 +76,7 @@
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard Utama
         </button>
         <button onclick="switchTab('penilaian')" id="nav-penilaian" class="tab-btn py-3 md:py-3 px-4 md:px-6 font-medium text-sm flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap shrink-0">
-            <i data-lucide="star" class="w-4 h-4"></i> Dashboard Penilaian
+            <i data-lucide="star" class="w-4 h-4"></i> Dashboard Penilaian & Kehadiran
         </button>
         <button onclick="switchTab('database')" id="nav-database" class="tab-btn py-3 md:py-3 px-4 md:px-6 font-medium text-sm flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap shrink-0">
             <i data-lucide="lock" class="w-4 h-4" id="icon-tab-db"></i> Database Staf
@@ -210,6 +210,20 @@
                 </div>
             </div>
 
+            <!-- CARTA BARU: KEHADIRAN MENGIKUT TAHUN DENGAN KAD -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6 md:mb-8">
+                <h3 class="text-base md:text-lg font-semibold mb-4 md:mb-6 flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4 md:w-5 md:h-5 text-indigo-500"></i> Tren Kehadiran Mengikut Tahun
+                </h3>
+                
+                <!-- Bekas untuk Kad Bilangan -->
+                <div id="tahun-cards-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
+                    <!-- Kad akan dijana dari JS di sini -->
+                </div>
+
+                <div class="relative h-60 w-full"><canvas id="chart-tahun"></canvas></div>
+            </div>
+
             <!-- 4. JADUAL DATA TERKINI -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-8">
                 <div class="p-4 md:p-6 border-b border-slate-100">
@@ -317,6 +331,59 @@
                         <i data-lucide="megaphone" class="w-4 h-4 md:w-5 md:h-5 text-indigo-500"></i> Pendorong Utama Program
                     </h3>
                     <div class="relative h-56 md:h-64 w-full"><canvas id="chart-penilaian-pendorong"></canvas></div>
+                </div>
+            </div>
+
+            <!-- BAHAGIAN KEHADIRAN (Digabungkan dalam Tab Penilaian) -->
+            <div class="flex items-center gap-4 my-8">
+                <div class="h-px bg-slate-300 flex-1"></div>
+                <h2 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> Semakan Kehadiran Peserta
+                </h2>
+                <div class="h-px bg-slate-300 flex-1"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
+                <h3 class="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                    <i data-lucide="search" class="w-4 h-4"></i> Pilih Program Untuk Lihat Kehadiran
+                </h3>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1 relative">
+                        <i data-lucide="book" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                        <select id="filter-kehadiran-program" onchange="applyKehadiranFilter()" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 outline-none appearance-none cursor-pointer">
+                            <option value="">-- Sila Pilih Program --</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-3 text-slate-400 pointer-events-none"></i>
+                    </div>
+                    <div class="bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-lg border border-indigo-100 flex items-center justify-center gap-2 font-medium shrink-0">
+                        <i data-lucide="users" class="w-4 h-4"></i> <span id="kehadiran-count">0</span> Hadir
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-8 hidden animate-fade-in" id="kehadiran-table-container">
+                <div class="p-4 md:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
+                    <h3 class="text-base md:text-lg font-semibold flex items-center gap-2 text-slate-800">
+                        <i data-lucide="list-checks" class="w-4 h-4 md:w-5 md:h-5 text-indigo-500"></i> Senarai Peserta Hadir
+                    </h3>
+                    <button onclick="downloadKehadiranCSV()" class="w-full sm:w-auto text-xs md:text-sm bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm border border-emerald-200">
+                        <i data-lucide="download" class="w-4 h-4"></i> Muat Turun Senarai (CSV)
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
+                        <thead class="text-[10px] md:text-xs text-slate-500 uppercase bg-slate-100 border-b border-slate-200">
+                            <tr>
+                                <th class="px-4 py-3 md:px-6 md:py-4 font-semibold">Bil.</th>
+                                <th class="px-4 py-3 md:px-6 md:py-4 font-semibold">Nama Penuh</th>
+                                <th class="px-4 py-3 md:px-6 md:py-4 font-semibold">No. K/P</th>
+                                <th class="px-4 py-3 md:px-6 md:py-4 font-semibold">Jabatan</th>
+                                <th class="px-4 py-3 md:px-6 md:py-4 font-semibold">Jawatan</th>
+                                <th class="px-4 py-3 md:px-6 md:py-4 font-semibold text-center">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kehadiran-table-body" class="divide-y divide-slate-100 bg-white"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -550,13 +617,18 @@
         // URL PENILAIAN PROGRAM BAHARU
         const PENILAIAN_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSZ0eZILz-97Ip-0wi9zo7KzFdOUQPHr7tw3GNNMynvYAKHLkY3blChMnYAM3zDFBHTZ7NnaMZqP6z5/pub?output=csv';
 
+        // URL SENARAI PROGRAM (Untuk dapatkan Tarikh Sebenar Program)
+        const SENARAI_PROGRAM_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQTf9RxrTq6lu7WAR-Tn5LQHbgeTesGcudToFEOkh0ED2oF1EI5hE74AbWRxhS98KAzC8ja9k9Wnqet/pub?gid=553481558&single=true&output=csv';
+
         let globalStaffDatabase = [];
         let globalRecentData = [];
         let globalPenilaianData = [];
+        let globalKakitanganData = []; // Data Mentah untuk tab Kehadiran
         
         // Charts Instances
         let chartProgramInstance = null;
         let chartJantinaInstance = null;
+        let chartTahunInstance = null;
         let chartPenilaianJantina = null;
         let chartPenilaianPendorong = null;
         let chartPenilaianKriteria = null;
@@ -649,13 +721,14 @@
             document.getElementById('btn-reload').disabled = true;
 
             try {
-                // MUAT TURUN SEMUA DATA (Termasuk Penilaian)
-                const [kursusData, kakitanganData, sijilData, passwordData, penilaianDataRaw] = await Promise.all([
+                // MUAT TURUN SEMUA DATA (Termasuk Penilaian dan Senarai Program)
+                const [kursusData, kakitanganData, sijilData, passwordData, penilaianDataRaw, senaraiProgramData] = await Promise.all([
                     fetchCSV(KURSUS_CSV_URL, { header: true }),
                     fetchCSV(KAKITANGAN_CSV_URL, { header: true }), // Ini tab Pendaftaran_Program
                     fetchCSV(SIJIL_CSV_URL, { header: false }),
                     fetchCSV(PASSWORD_CSV_URL, { header: false }),
-                    fetchCSV(PENILAIAN_CSV_URL, { header: true })
+                    fetchCSV(PENILAIAN_CSV_URL, { header: true }),
+                    fetchCSV(SENARAI_PROGRAM_CSV_URL, { header: true })
                 ]);
 
                 // Ekstrak Password
@@ -703,6 +776,20 @@
                 document.getElementById('val-sijil-luput').innerText = tamatSijilCP;
 
                 // ============================================
+                // MAP TARIKH PROGRAM SEBENAR
+                // ============================================
+                const programDateMap = {};
+                if (senaraiProgramData) {
+                    senaraiProgramData.forEach(row => {
+                        const prog = row['Nama Program'] || row['NAMA PROGRAM'];
+                        const tarikh = row['Tarikh'] || row['TARIKH'];
+                        if(prog && tarikh) {
+                            programDateMap[prog.trim()] = tarikh.trim();
+                        }
+                    });
+                }
+
+                // ============================================
                 // LOGIK DATABASE STAF
                 // ============================================
                 globalStaffDatabase = sijilData.slice(1).map(row => {
@@ -747,9 +834,23 @@
                             if(!sijilUrl && Object.values(c).length >= 11) {
                                 sijilUrl = Object.values(c)[10]; // Mengambil nilai dari lajur ke-11 (Column K)
                             }
+
+                            const namaProg = c['Nama Program'] || c['NAMA PROGRAM'] || '-';
+                            
+                            // Dapatkan tarikh sebenar program dari programDateMap. Jika tiada, fallback ke Timestamp
+                            let tarikhProgSebenar = programDateMap[namaProg.trim()];
+                            if (!tarikhProgSebenar) {
+                                tarikhProgSebenar = c['Tarikh Program'] || c['Tarikh'] || c['Timestamp'] || '-';
+                                // Buang masa jika ia adalah Timestamp fallback supaya lebih kemas
+                                if (tarikhProgSebenar.includes(' ')) {
+                                    tarikhProgSebenar = tarikhProgSebenar.split(' ')[0];
+                                }
+                            }
+
                             return {
-                                tarikh: c['Timestamp'] || '-', 
-                                namaProgram: c['Nama Program'] || c['NAMA PROGRAM'] || '-',
+                                tarikhKeyIn: c['Timestamp'] || '-', // Simpan untuk rujukan upload PDF sijil
+                                tarikh: tarikhProgSebenar, // Tarikh sebenar program untuk dipapar di jadual
+                                namaProgram: namaProg,
                                 sijil: (typeof sijilUrl === 'string' && sijilUrl.startsWith('http')) ? sijilUrl : ''
                             };
                         })
@@ -759,18 +860,33 @@
                 populateJabatanFilter();
                 applyFilters(preserveState);
 
-                const programCount = {}; const jantinaCount = {};
+                const programCount = {}; const jantinaCount = {}; const tahunCount = {};
                 kursusData.forEach(row => {
                     const prog = row['Nama Program'] || row['NAMA PROGRAM'] || 'Lain-lain';
                     const jant = row['Jantina'] || row['JANTINA'] || 'Tidak Dinyatakan';
+                    
+                    // Ekstrak Tahun dari Tarikh Sebenar
+                    let tarikhSebenar = programDateMap[prog.trim()];
+                    if (!tarikhSebenar) tarikhSebenar = row['Tarikh Program'] || row['Tarikh'] || row['Timestamp'] || '';
+                    
+                    let tahun = "Tiada Rekod";
+                    if (tarikhSebenar) {
+                        const yearMatch = tarikhSebenar.match(/\b(20\d{2})\b/);
+                        if (yearMatch) tahun = yearMatch[1];
+                    }
+
                     programCount[prog] = (programCount[prog] || 0) + 1;
                     jantinaCount[jant] = (jantinaCount[jant] || 0) + 1;
+                    tahunCount[tahun] = (tahunCount[tahun] || 0) + 1;
                 });
 
                 const topPrograms = Object.keys(programCount)
                     .map(key => ({ name: key, jumlah: programCount[key] })).sort((a, b) => b.jumlah - a.jumlah).slice(0, 5);
                 
-                renderCharts(topPrograms, jantinaCount);
+                const tahunChartData = Object.keys(tahunCount)
+                    .map(key => ({ tahun: key, jumlah: tahunCount[key] })).sort((a, b) => a.tahun.localeCompare(b.tahun));
+                
+                renderCharts(topPrograms, jantinaCount, tahunChartData);
 
                 globalRecentData = kursusData.slice(-10).reverse();
                 renderRecentTable();
@@ -781,6 +897,28 @@
                 globalPenilaianData = penilaianDataRaw;
                 populatePenilaianFilters();
                 applyPenilaianFilters();
+
+                // ============================================
+                // LOGIK UNTUK TAB KEHADIRAN PROGRAM
+                // ============================================
+                globalKakitanganData = kakitanganData;
+                const progKehadiranSet = new Set();
+                kakitanganData.forEach(row => {
+                    const p = row['Nama Program'] || row['NAMA PROGRAM'];
+                    if(p && p.trim() !== '') progKehadiranSet.add(p.trim());
+                });
+                
+                const selectKehadiran = document.getElementById('filter-kehadiran-program');
+                selectKehadiran.innerHTML = '<option value="">-- Sila Pilih Program --</option>';
+                Array.from(progKehadiranSet).sort().forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p; opt.textContent = p;
+                    selectKehadiran.appendChild(opt);
+                });
+                
+                // Clear state jika page reload
+                document.getElementById('kehadiran-table-container').classList.add('hidden');
+                document.getElementById('kehadiran-count').innerText = '0';
 
                 // Papar Content Utama
                 document.getElementById('loading-container').classList.add('hidden');
@@ -990,6 +1128,108 @@
             });
         }
 
+        // ==============================================================
+        // FUNGSI TAB KEHADIRAN PROGRAM (BARU)
+        // ==============================================================
+        function applyKehadiranFilter() {
+            const selectedProg = document.getElementById('filter-kehadiran-program').value;
+            const container = document.getElementById('kehadiran-table-container');
+            const tbody = document.getElementById('kehadiran-table-body');
+            const countEl = document.getElementById('kehadiran-count');
+
+            if (!selectedProg) {
+                container.classList.add('hidden');
+                countEl.innerText = '0';
+                return;
+            }
+
+            const attendees = globalKakitanganData.filter(row => {
+                const p = row['Nama Program'] || row['NAMA PROGRAM'];
+                return p && p.trim() === selectedProg;
+            });
+
+            countEl.innerText = attendees.length;
+            container.classList.remove('hidden');
+            tbody.innerHTML = '';
+
+            if (attendees.length === 0) {
+                tbody.innerHTML = `<tr><td colSpan="6" class="px-4 py-6 md:px-6 md:py-8 text-center text-slate-500">Tiada rekod kehadiran dijumpai untuk program ini.</td></tr>`;
+                return;
+            }
+
+            attendees.forEach((row, index) => {
+                const nama = row['Nama Penuh'] || row['NAMA PENUH'] || '-';
+                const ic = row['No K/P'] || row['NO. K/P'] || Object.values(row)[3] || '-';
+                const jabatan = row['Jabatan'] || row['JABATAN'] || '-';
+                const jawatan = row['Jawatan'] || row['JAWATAN'] || '-';
+                
+                const cleanIC = ic.toString().trim();
+                const staffIndex = globalStaffDatabase.findIndex(s => s['NO. K/P'] === cleanIC);
+                
+                let viewBtn = '';
+                if (staffIndex !== -1) {
+                    viewBtn = `<button onclick="openModalByIC('${cleanIC}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-xs font-medium transition-colors border border-indigo-100">
+                                <i data-lucide="user" class="w-3.5 h-3.5"></i> Lihat Profil
+                               </button>`;
+                } else {
+                    viewBtn = `<span class="text-[10px] text-slate-400 italic">Tiada Profil</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 md:px-6 md:py-4 text-slate-500 font-medium">${index + 1}</td>
+                    <td class="px-4 py-3 md:px-6 md:py-4 font-medium text-slate-900">${nama}</td>
+                    <td class="px-4 py-3 md:px-6 md:py-4 text-slate-600 font-mono text-xs">${ic}</td>
+                    <td class="px-4 py-3 md:px-6 md:py-4 text-slate-600">${jabatan}</td>
+                    <td class="px-4 py-3 md:px-6 md:py-4 text-slate-600">${jawatan}</td>
+                    <td class="px-4 py-3 md:px-6 md:py-4 text-center">${viewBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        // Buka paparan profil terus melalui carian Kad Pengenalan
+        function openModalByIC(ic) {
+            const staff = globalStaffDatabase.find(s => s['NO. K/P'] === ic);
+            if (staff) {
+                currentEditStaff = staff; 
+                renderStaffProfile('modal', staff);
+                toggleEditMode(false); 
+                document.getElementById('staff-modal').classList.remove('hidden');
+                document.getElementById('staff-modal').classList.add('flex');
+            }
+        }
+
+        function downloadKehadiranCSV() {
+            const selectedProg = document.getElementById('filter-kehadiran-program').value;
+            if (!selectedProg) return;
+            
+            const attendees = globalKakitanganData.filter(row => {
+                const p = row['Nama Program'] || row['NAMA PROGRAM'];
+                return p && p.trim() === selectedProg;
+            });
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Bil,Nama Penuh,No K/P,Jabatan,Jawatan\n";
+            
+            attendees.forEach((row, index) => {
+                const nama = `"${(row['Nama Penuh'] || row['NAMA PENUH'] || '').replace(/"/g, '""')}"`;
+                const ic = `"${(row['No K/P'] || row['NO. K/P'] || Object.values(row)[3] || '').replace(/"/g, '""')}"`;
+                const jabatan = `"${(row['Jabatan'] || row['JABATAN'] || '').replace(/"/g, '""')}"`;
+                const jawatan = `"${(row['Jawatan'] || row['JAWATAN'] || '').replace(/"/g, '""')}"`;
+                csvContent += `${index + 1},${nama},${ic},${jabatan},${jawatan}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Senarai_Kehadiran_${selectedProg.replace(/[^a-z0-9]/gi, '_')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
         // ==============================================================
         // LOGIK DATABASE STAF DAN UTILITIES 
@@ -1361,7 +1601,7 @@
                                 <input type="file" id="pdf-upload-${index}" class="hidden" accept="application/pdf" 
                                     data-ic="${staff['NO. K/P']}" 
                                     data-program="${k.namaProgram.replace(/"/g, '&quot;')}" 
-                                    data-timestamp="${k.tarikh}"
+                                    data-timestamp="${k.tarikhKeyIn}"
                                     data-index="${index}"
                                     onchange="handleUploadSijil(this)">
                                 
@@ -1800,10 +2040,11 @@
             });
         }
 
-        function renderCharts(topPrograms, jantinaCount) {
+        function renderCharts(topPrograms, jantinaCount, tahunChartData) {
             const chartColors = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
             if (chartProgramInstance) chartProgramInstance.destroy();
             if (chartJantinaInstance) chartJantinaInstance.destroy();
+            if (chartTahunInstance) chartTahunInstance.destroy();
 
             const ctxBar = document.getElementById('chart-program').getContext('2d');
             chartProgramInstance = new Chart(ctxBar, {
@@ -1821,6 +2062,43 @@
                 data: { labels: jantinaLabels, datasets: [{ data: jantinaData, backgroundColor: chartColors.slice(0, jantinaLabels.length), borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } } }
             });
+
+            if(tahunChartData) {
+                /* Render Kad Bilangan */
+                const cardsContainer = document.getElementById('tahun-cards-container');
+                if (cardsContainer) {
+                    cardsContainer.innerHTML = tahunChartData.map(d => `
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 text-center transition-transform hover:-translate-y-1 shadow-sm">
+                            <p class="text-[11px] md:text-xs font-bold text-emerald-600 mb-1 uppercase tracking-wider">${d.tahun}</p>
+                            <h4 class="text-lg md:text-2xl font-bold text-emerald-800">${d.jumlah}</h4>
+                        </div>
+                    `).join('');
+                }
+
+                /* Render Carta Bar */
+                const ctxTahun = document.getElementById('chart-tahun').getContext('2d');
+                chartTahunInstance = new Chart(ctxTahun, {
+                    type: 'bar',
+                    data: { 
+                        labels: tahunChartData.map(d => d.tahun), 
+                        datasets: [{ 
+                            label: 'Jumlah Kehadiran', 
+                            data: tahunChartData.map(d => d.jumlah), 
+                            backgroundColor: '#10b981', 
+                            borderRadius: 4
+                        }] 
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { display: false } }, 
+                        scales: { 
+                            y: { beginAtZero: true, grid: { color: '#e2e8f0' } }, 
+                            x: { grid: { display: false } } 
+                        } 
+                    }
+                });
+            }
         }
 
         document.getElementById('form-semakan').addEventListener('submit', function(e) {
