@@ -565,20 +565,83 @@
             <div class="p-4 md:p-6 overflow-y-auto">
                 <form id="add-individu-form" class="flex flex-col gap-3 md:gap-4" onsubmit="submitAddIndividu(event)">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Nama Penuh</label><input type="text" id="add-nama" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. K/P</label><input type="text" id="add-ic" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Umur (Auto)</label><input type="number" id="add-umur" class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-md text-xs md:text-sm focus:outline-none" readonly></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jantina</label><select id="add-jantina" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="">Sila Pilih</option><option value="Lelaki">Lelaki</option><option value="Wanita">Wanita</option></select></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jawatan</label><input type="text" id="add-jawatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jabatan/Unit</label><input type="text" id="add-jabatan" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">E-Mel</label><input type="email" id="add-emel" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. Telefon</label><input type="text" id="add-telefon" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div class="sm:col-span-2 mt-1 md:mt-2 pt-2 md:pt-3 border-t border-slate-100"><h4 class="text-xs md:text-sm font-semibold text-slate-700">Maklumat Sijil & Gambar</h4></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Sijil C&P HMI</label><select id="add-sijilhmi" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"><option value="Tidak">Tidak</option><option value="Ya">Ya</option></select></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Muat Naik Gambar (Opsyenal)</label><input type="file" id="add-gambar" accept="image/*" class="w-full px-3 py-1.5 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Mula</label><input type="date" id="add-tarikhmula" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                        <div><label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Tamat</label><input type="date" id="add-tarikhtamat" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></div>
+                        
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Nama Penuh</label>
+                            <input type="text" id="add-nama" list="list-add-nama" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none uppercase" autocomplete="off">
+                            <datalist id="list-add-nama"></datalist>
+                            <p id="add-nama-warning" class="text-xs text-rose-500 mt-1 hidden font-medium flex items-center"></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. K/P</label>
+                            <input type="text" id="add-ic" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none" autocomplete="off">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Umur (Auto)</label>
+                            <input type="number" id="add-umur" class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-md text-xs md:text-sm focus:outline-none" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jantina</label>
+                            <select id="add-jantina" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                                <option value="">Sila Pilih</option>
+                                <option value="Lelaki">Lelaki</option>
+                                <option value="Wanita">Wanita</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jawatan</label>
+                            <input type="text" id="add-jawatan" list="list-add-jawatan" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none uppercase" autocomplete="off">
+                            <datalist id="list-add-jawatan"></datalist>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Jabatan/Unit</label>
+                            <input type="text" id="add-jabatan" list="list-add-jabatan" required class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none uppercase" autocomplete="off">
+                            <datalist id="list-add-jabatan"></datalist>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">E-Mel</label>
+                            <input type="email" id="add-emel" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none" autocomplete="off">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">No. Telefon</label>
+                            <input type="text" id="add-telefon" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none" autocomplete="off">
+                        </div>
+                        
+                        <div class="sm:col-span-2 mt-1 md:mt-2 pt-2 md:pt-3 border-t border-slate-100">
+                            <h4 class="text-xs md:text-sm font-semibold text-slate-700">Maklumat Sijil & Gambar</h4>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Sijil C&P HMI</label>
+                            <select id="add-sijilhmi" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                                <option value="Tidak">Tidak</option>
+                                <option value="Ya">Ya</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Muat Naik Gambar (Opsyenal)</label>
+                            <input type="file" id="add-gambar" accept="image/*" class="w-full px-3 py-1.5 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Mula</label>
+                            <input type="date" id="add-tarikhmula" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-medium text-slate-500 mb-1">Tarikh Tamat</label>
+                            <input type="date" id="add-tarikhtamat" class="w-full px-3 py-2 border border-slate-200 rounded-md text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
                     </div>
+                    
                     <div class="flex justify-end pt-4 mt-2 border-t border-slate-100">
                         <button type="submit" id="btn-submit-add-individu" class="w-full sm:w-auto px-4 py-2.5 md:py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Simpan Rekod</button>
                     </div>
@@ -859,6 +922,9 @@
                 
                 populateJabatanFilter();
                 applyFilters(preserveState);
+                
+                // MENGISI DATA DATALIST UNTUK TAMBAH STAF BAHARU (Baru ditambah)
+                populateAddStaffDatalists();
 
                 const programCount = {}; const jantinaCount = {}; const tahunCount = {};
                 kursusData.forEach(row => {
@@ -1273,6 +1339,80 @@
             }
         }
 
+        function populateAddStaffDatalists() {
+            const listNama = document.getElementById('list-add-nama');
+            const listJabatan = document.getElementById('list-add-jabatan');
+            const listJawatan = document.getElementById('list-add-jawatan');
+
+            if (listNama) {
+                listNama.innerHTML = '';
+                const uniqueNama = [...new Set(globalStaffDatabase.map(s => (s['NAMA PENUH'] || '').trim().toUpperCase()).filter(Boolean))].sort();
+                uniqueNama.forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val; listNama.appendChild(opt);
+                });
+            }
+            
+            if (listJabatan) {
+                listJabatan.innerHTML = '';
+                const uniqueJabatan = [...new Set(globalStaffDatabase.map(s => (s['JABATAN/UNIT'] || '').trim().toUpperCase()).filter(Boolean))].sort();
+                uniqueJabatan.forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val; listJabatan.appendChild(opt);
+                });
+            }
+
+            if (listJawatan) {
+                listJawatan.innerHTML = '';
+                const uniqueJawatan = [...new Set(globalStaffDatabase.map(s => (s['JAWATAN'] || '').trim().toUpperCase()).filter(Boolean))].sort();
+                uniqueJawatan.forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val; listJawatan.appendChild(opt);
+                });
+            }
+        }
+
+        // Fungsi Pintar Untuk Mengelak Duplikasi Semasa Mendaftar Staf Baru
+        function checkAddStaffDuplicates() {
+            const nameVal = document.getElementById('add-nama').value.trim().toUpperCase();
+            const icVal = document.getElementById('add-ic').value.trim();
+            const warningEl = document.getElementById('add-nama-warning');
+            const submitBtn = document.getElementById('btn-submit-add-individu');
+
+            const nameDup = globalStaffDatabase.find(s => (s['NAMA PENUH'] || '').trim().toUpperCase() === nameVal && nameVal !== '');
+            const icDup = globalStaffDatabase.find(s => (s['NO. K/P'] || '').trim() === icVal && icVal.length >= 12);
+
+            if (nameDup || icDup) {
+                warningEl.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                let matchedStaff = nameDup || icDup;
+                if (nameDup) {
+                    warningEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> Rekod nama ini telah wujud (K/P: ${matchedStaff['NO. K/P']}). Pendaftaran dihalang.`;
+                    
+                    // Auto-fill IC field untuk kemudahan admin
+                    if(!icVal) {
+                        const icInput = document.getElementById('add-ic');
+                        icInput.value = matchedStaff['NO. K/P'] || '';
+                        icInput.dispatchEvent(new Event('input')); // trigger umur format
+                    }
+                } else {
+                    warningEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> No. K/P ini telah wujud untuk staf bernama ${matchedStaff['NAMA PENUH']}. Pendaftaran dihalang.`;
+                }
+                
+                // Auto-fill maklumat jabatan & jawatan staf ini supaya user nampak
+                if (!document.getElementById('add-jabatan').value) document.getElementById('add-jabatan').value = matchedStaff['JABATAN/UNIT'] || '';
+                if (!document.getElementById('add-jawatan').value) document.getElementById('add-jawatan').value = matchedStaff['JAWATAN'] || '';
+
+                lucide.createIcons();
+            } else {
+                warningEl.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
         function applyFilters(preservePage = false) {
             const searchText = document.getElementById('input-search-db').value.toLowerCase();
             const selectedJabatan = document.getElementById('filter-jabatan').value;
@@ -1382,7 +1522,12 @@
         }
 
         document.getElementById('edit-ic').addEventListener('input', function() { formatICNumber(this); });
-        document.getElementById('add-ic').addEventListener('input', function() { formatICNumber(this); });
+        
+        // Listener baharu untuk menyemak duplikasi
+        document.getElementById('add-ic').addEventListener('input', function() { 
+            formatICNumber(this); 
+            checkAddStaffDuplicates(); 
+        });
         
         function autoJantina(inputElement, targetSelectId) {
             const name = inputElement.value.toLowerCase();
@@ -1391,7 +1536,12 @@
             else if (name.includes(' binti ') || name.endsWith(' binti')) jantinaSelect.value = 'Wanita';
         }
         document.getElementById('edit-nama').addEventListener('input', function() { autoJantina(this, 'edit-jantina'); });
-        document.getElementById('add-nama').addEventListener('input', function() { autoJantina(this, 'add-jantina'); });
+        
+        // Listener baharu untuk menyemak duplikasi berdasarkan carian dropdown / ejaan nama
+        document.getElementById('add-nama').addEventListener('input', function() { 
+            autoJantina(this, 'add-jantina'); 
+            checkAddStaffDuplicates(); 
+        });
 
         const formatToSave = (dateStr) => {
             if (!dateStr) return '';
@@ -1754,6 +1904,12 @@
             document.getElementById('add-gambar').value = ""; // Reset gambar
             document.getElementById('bulk-paste-input').value = '';
             document.getElementById('bulk-preview-area').classList.add('hidden');
+            document.getElementById('add-nama-warning').classList.add('hidden');
+            
+            const submitBtn = document.getElementById('btn-submit-add-individu');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
             pendingBulkData = [];
         }
 
